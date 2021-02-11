@@ -6,16 +6,17 @@ import yaml from 'js-yaml';
 
 import { Route } from 'react-static';
 
-import { Register } from '@riboseinc/paneron-registry-kit/types';
-
-import { ConceptData } from '@riboseinc/paneron-extension-glossarist/classes/concept';
-import { DesignationData } from '@riboseinc/paneron-extension-glossarist/classes/designation';
-import { DefinitionData } from '@riboseinc/paneron-extension-glossarist/classes/definition';
+import { RegisterItem } from '@riboseinc/paneron-registry-kit/types';
 
 import {
   ReactStaticState,
   PluginConfig,
-  ConceptPageRouteData,
+  RegisterItemPageRouteData,
+  MainRegistryPageRouteData,
+  RegistryStatistics,
+  CommonRouteData,
+  ItemClassPageRouteData,
+  SubregisterPageRouteData,
 } from './types';
 
 import SimpleCache from './SimpleCache';
@@ -25,225 +26,200 @@ import SimpleCache from './SimpleCache';
 const cache = new SimpleCache();
 
 
-const UNIVERSAL_REGISTER_NAME = 'universal';
-
-
-interface LanguageSpecificDirEntries {
-  [langID: string]: {
-    definitions: { [uuid: string]: string }
-    designations: { [uuid: string]: string }
-  }
+function getTemplate(what: string = 'RegisterItem'): string {
+  const _defaultTemplateSrc = path.join(__dirname, `Default${what}Page`);
+  const _defaultTemplate = path.join(process.cwd(), `_${what}Page`);
+  shell(`mkdir -p "${_defaultTemplate}"`);
+  shell(`cp -r "${_defaultTemplateSrc}/"* "${_defaultTemplate}"`)
+  return `_${what}Page/index`;
 }
 
 
 export default ({
-  datasetSourcePath, urlPrefix, template, conceptTemplate,
+  datasetSourcePath, urlPrefix,
+  itemClassConfiguration, subregisters,
   footerBanner, headerBanner, footerBannerLink,
 }: PluginConfig) => {
 
   return {
 
-    getRoutes: async (routes: Route[], _state: ReactStaticState) => {
+    getRoutes: async (routesBefore: Route[], _state: ReactStaticState) => {
       const subregisterRoot = path.join(datasetSourcePath, 'subregisters');
-      const subregisterDirEntries = dirTree(subregisterRoot).children!;
 
-      const universalConceptRoot = path.join(
-        subregisterRoot,
-        UNIVERSAL_REGISTER_NAME,
-        'concept');
-
-      const languageRoots = subregisterDirEntries.
-        map(entry => entry.name).
-        filter(n => n !== UNIVERSAL_REGISTER_NAME);
-
-      const languageSpecificDirEntries: LanguageSpecificDirEntries =
-      languageRoots.map(langDirName => {
-        const langRoot = path.join(subregisterRoot, langDirName);
-
-        let designations: { [uuid: string]: string } = {};
-        try {
-          for (const dirent of (dirTree(path.join(langRoot, 'designation')).children ?? [])) {
-            designations[noExt(dirent.name)] = path.join(langRoot, 'designation', dirent.name);
-          }
-        } catch (e) {
-          console.error("Couldn’t collect designation paths", e);
-        }
-
-        let definitions: { [uuid: string]: string } = {};
-        try {
-          for (const dirent of (dirTree(path.join(langRoot, 'definition')).children ?? [])) {
-            designations[noExt(dirent.name)] = path.join(langRoot, 'definition', dirent.name);
-          }
-        } catch (e) {
-          console.error("Couldn’t collect definition paths", e);
-        }
-
-        return {
-          [langDirName]: {
-            designations,
-            definitions,
-          },
-        };
-      }).reduce((prev, curr) => ({ ...prev, ...curr }), {});
-
-      const universalConceptEntries = dirTree(
-        universalConceptRoot,
-        { extensions: /\.yaml$/ },
-      ).children;
-
-      const registerMeta = await getFileData<Register>(path.join(datasetSourcePath, 'register.yaml'));
-
-      const basePath = _state.config.basePath || '';
-
-      if (universalConceptEntries) {
-
-        let effectiveTemplate: string;
-
-        if (!conceptTemplate) {
-          const _defaultTemplateSrc = path.join(__dirname, 'DefaultConceptPage');
-          const _defaultTemplate = path.join(process.cwd(), '_ConceptPage');
-          shell(`mkdir -p "${_defaultTemplate}"`);
-          shell(`cp -r "${_defaultTemplateSrc}/"* "${_defaultTemplate}"`)
-          effectiveTemplate = '_ConceptPage/index';
-        } else {
-          effectiveTemplate = conceptTemplate;
-        }
-
-        //const [docsNav, redirectRoutes] = await Promise.all([
-        //  await Promise.all(
-        //    (universalConceptEntries.children || []).filter(isValid).map(c => getDocsPageItems(c))
-        //  ),
-        //  await Promise.all(
-        //    (universalConceptEntries.children || []).filter(isValid).map(c => getRedirects(urlPrefix, c, urlPrefix))
-        //  ),
-        //]);
-
-        return [
-          ...routes,
-          ...universalConceptEntries.map(entry => datasetDirEntryToConceptRoute(
-            entry,
-            effectiveTemplate,
-            languageSpecificDirEntries,
-            {
-              siteURLPrefix: basePath,
-              glossaryURLPrefix: urlPrefix,
-              register: registerMeta,
-              headerBanner,
-              footerBanner,
-              footerBannerLink,
-            },
-          )),
-        ];
-      } else {
-        return routes;
+      let hasSubregisters: boolean;
+      try {
+        hasSubregisters = fs.statSync(subregisterRoot).isDirectory();
+      } catch (e) {
+        hasSubregisters = false;
       }
+
+      const statistics: RegistryStatistics = { totalItemCount: 0 };
+
+      let registerContentRoutes: Route[];
+
+      const commonRouteData: CommonRouteData = {
+        siteURLPrefix: _state.config.basePath || '',
+        registerURLPrefix: urlPrefix,
+        subregisters,
+        itemClassConfiguration,
+        headerBanner,
+        footerBanner,
+        footerBannerLink,
+      };
+
+      const itemTemplate = getTemplate('RegisterItem');
+      const itemClassTemplate = getTemplate('ItemClass');
+      const subregisterTemplate = getTemplate('Subregister');
+
+      if (hasSubregisters) {
+        const subregDirents = dirTree(subregisterRoot).children || [];
+        registerContentRoutes = subregDirents.map(dirent => direntToSubregRoute(
+          dirent,
+          subregisterTemplate,
+          itemClassTemplate,
+          itemTemplate,
+          commonRouteData));
+      } else {
+        const itemClassDirents = dirTree(datasetSourcePath, { attributes: ['isDirectory'] }).children || [];
+        registerContentRoutes = itemClassDirents.map(dirent => direntToItemClassRoute(
+          dirent,
+          itemClassTemplate,
+          itemTemplate,
+          commonRouteData));
+      }
+
+      let routes: Route[] = [
+        ...routesBefore,
+        {
+          path: urlPrefix,
+          template: getTemplate('Home'),
+          getData: async (): Promise<MainRegistryPageRouteData> => ({
+            statistics,
+          }),
+        },
+        ...registerContentRoutes,
+      ];
+
+      return routes;
     },
-
-    afterExport: async (state: ReactStaticState) => {
-      // const docsURLPrefix = `${urlPrefix}/`;
-      // const docsSrcPrefix = path.basename(sourcePath);
-      // const docsOutPrefix = `dist/${urlPrefix}`;
-
-      // console.debug("After export: Processing page media…");
-      // console.debug("| URL prefix", docsURLPrefix);
-      // console.debug("| Source path prefix", docsSrcPrefix);
-      // console.debug("| output path prefix", docsOutPrefix);
-
-      // console.debug("| Copying banners…");
-
-      // fs.copyFileSync(path.join(headerBanner), path.join(docsOutPrefix, headerBanner));
-      // fs.copyFileSync(path.join(footerBanner), path.join(docsOutPrefix, footerBanner));
-
-      // console.debug("| | Done");
-
-      // console.debug("| Processing routes…");
-
-      // for (const r of state.routes) {
-      //   if (docsURLPrefix === '/' || r.path === urlPrefix || r.path.indexOf(docsURLPrefix) === 0) {
-      //     const id = r.path.startsWith(docsURLPrefix)
-      //       ? r.path.replace(docsURLPrefix, '')
-      //       : r.path;
-      //     const _data = r.data?.docPage?.data;
-      //     console.debug("| | Processing docs page route with path", r.path, "and parsed ID", id);
-      //     if (!_data) {
-      //       console.debug("| | | No route data found, skipping");
-      //     } else {
-      //       const media = (_data.media || []);
-      //       const pageSourcePath = (r._isIndexFile && r.path !== urlPrefix) ? id : path.dirname(id);
-      //       const pageTargetPath = (r.path !== urlPrefix) ? id : path.dirname(id);
-      //       console.debug("| | | Page source path", pageSourcePath);
-      //       console.debug("| | | Page target path", pageTargetPath);
-      //       console.debug("| | | Copying media files…");
-      //       for (const f of media) {
-      //         const mediaSource = `${docsSrcPrefix}/${pageSourcePath}/${f.filename}`;
-      //         const mediaTarget = `${docsOutPrefix}/${pageTargetPath}/${f.filename}`;
-      //         console.debug("| | | | Copying file", mediaSource, mediaTarget);
-      //         fs.copyFileSync(mediaSource, mediaTarget);
-      //         console.debug("| | | | | Done");
-      //       }
-      //     }
-      //   } else {
-      //     console.debug("| | Skipping non-docs-page route with path", r.path);
-      //   }
-      // }
-
-      // return state;
-    },
-
   };
 
 };
 
 
-function datasetDirEntryToConceptRoute(
-  entry: DirectoryTree,
-  template: string,
-  relatedItems: LanguageSpecificDirEntries,
-  context: Omit<ConceptPageRouteData, 'concept' | 'relatedItemData'>,
+function direntToSubregRoute(
+  dirent: DirectoryTree,
+  subregisterTemplate: string,
+  itemClassTemplate: string,
+  itemTemplate: string,
+  context: CommonRouteData,
 ): Route {
+  const subregisterID = dirent.name;
+
   return {
-    path: datasetDirEntryNameToRoutePath(entry.name),
-    template,
-    getData: getConceptPageRouteData(entry, relatedItems, context),
+    path: subregisterID,
+    template: subregisterTemplate,
+    children: (dirent.children ?? []).map(dirent => direntToItemClassRoute(
+      dirent,
+      itemClassTemplate,
+      itemTemplate,
+      context,
+      subregisterID,
+    )),
+    getData: getSubregisterPageRouteData(dirent, context),
   };
 }
 
 
-function getConceptPageRouteData(
-  universalConceptEntry: DirectoryTree,
-  relatedItems: LanguageSpecificDirEntries,
-  context: Omit<ConceptPageRouteData, 'concept' | 'relatedItemData'>,
-): () => Promise<ConceptPageRouteData> {
+function direntToItemClassRoute(
+  dirent: DirectoryTree,
+  itemClassTemplate: string,
+  itemTemplate: string,
+  context: CommonRouteData,
+  subregisterID?: string,
+): Route {
+  const classID = dirent.name;
+
+  return {
+    path: classID,
+    template: itemClassTemplate,
+    children: (dirent.children ?? []).map(dirent => direntToItemRoute(
+      dirent,
+      itemTemplate,
+      context,
+      classID,
+      subregisterID,
+    )),
+    getData: getItemClassPageRouteData(dirent, context),
+  };
+}
+
+
+function direntToItemRoute(
+  dirent: DirectoryTree,
+  itemTemplate: string,
+  context: CommonRouteData,
+  itemClassID: string,
+  subregisterID?: string,
+): Route {
+  const itemID = noExt(dirent.name);
+
+  return {
+    path: itemID,
+    template: itemTemplate,
+    getData: getItemPageRouteData(dirent, context),
+  };
+}
+
+
+function getSubregisterPageRouteData(
+  dirent: DirectoryTree,
+  context: CommonRouteData,
+): () => Promise<SubregisterPageRouteData> {
+  const subregisterID = dirent.name;
+  const subregister = context.subregisters[subregisterID];
 
   return async () => {
-    const dataPath = universalConceptEntry.path;
-    const _conceptData = await getFileData<ConceptData>(dataPath);
-
-    const _relatedItemData: ConceptPageRouteData["relatedItemData"] = {
-      'designations': {},
-      'definitions': {},
+    return {
+      ...context,
+      subregister,
     };
+  };
+}
 
-    for (const [langID, designations] of Object.entries(_conceptData.designations)) {
-      _relatedItemData.designations[langID] ||= {};
-      for (const uuid of designations) {
-        _relatedItemData.designations[langID][uuid] =
-          await getFileData<DesignationData>(relatedItems[langID].designations[uuid]);
-      }
-    }
 
-    for (const [langID, definitions] of Object.entries(_conceptData.definitions)) {
-      _relatedItemData.definitions[langID] ||= {};
-      for (const uuid of definitions) {
-        _relatedItemData.definitions[langID][uuid] =
-          await getFileData<DefinitionData>(relatedItems[langID].definitions[uuid]);
-      }
-    }
+function getItemClassPageRouteData(
+  dirent: DirectoryTree,
+  context: CommonRouteData,
+): () => Promise<ItemClassPageRouteData> {
+  const classID = dirent.name;
+  const itemClass = context.itemClassConfiguration[classID];
+  const itemPaths = (dirent.children ?? []).map(dirent => noExt(dirent.name));
+
+  return async () => {
+    const items = await Promise.all(itemPaths.map(async (itemPath) => await getFileData<RegisterItem<any>>(itemPath)));
 
     return {
       ...context,
-      concept: _conceptData,
-      relatedItemData: _relatedItemData,
+      itemClass,
+      items,
+    };
+  };
+}
+
+
+function getItemPageRouteData(
+  dirent: DirectoryTree,
+  context: CommonRouteData,
+): () => Promise<RegisterItemPageRouteData> {
+
+  return async () => {
+    const dataPath = dirent.path;
+    const item = await getFileData<RegisterItem<any>>(dataPath);
+
+    return {
+      ...context,
+      item,
     };
   };
 }
@@ -262,9 +238,9 @@ function noExt(filename: string): string {
 }
 
 
-function datasetDirEntryNameToRoutePath(name: string): string {
-  return `${noExt(name) || '/'}`;
-}
+// function datasetDirEntryNameToRoutePath(name: string): string {
+//   return `${noExt(name) || '/'}`;
+// }
 
 
 /* Getting data from YAML per dir tree entry */

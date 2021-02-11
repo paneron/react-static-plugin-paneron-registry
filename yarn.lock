@@ -992,11 +992,6 @@
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
 
-"@riboseinc/paneron-extension-glossarist@^1.0.0-dev9":
-  version "1.0.0-dev9"
-  resolved "https://registry.yarnpkg.com/@riboseinc/paneron-extension-glossarist/-/paneron-extension-glossarist-1.0.0-dev9.tgz#20696e5aa9689a61a544fbad55e402e5c1ea0891"
-  integrity sha512-rLa98Sr4jO519uYgPIXC2jfJ5CzEkIZ7roUJQQB7cmOdfaFR0mVchYHeZVWn0A5L6Q6oUFj4lmcPlsKuQsAw2A==
-
 "@riboseinc/paneron-extension-kit@=1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@riboseinc/paneron-extension-kit/-/paneron-extension-kit-1.0.1.tgz#b7a63f328b0f716e717d1c530b00390ec4bea486"

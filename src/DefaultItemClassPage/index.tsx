@@ -1,21 +1,24 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useRouteData } from 'react-static';
-import { ItemClassPageRouteData } from '../types';
+import { DefaultPageProps, ItemClassPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { useRegisterItemData, _getRelatedClass } from '../DefaultWidgets/helpers';
+import { Link } from '../DefaultWidgets/linksButtons';
 
 
-export default () => {
+export default ({ itemClassConfiguration }: DefaultPageProps) => {
   const {
     register,
-    itemClassConfiguration,
     items,
-    itemClass,
-    subregister,
+    itemClassID,
+    subregisterID,
+    subregisters,
   }: ItemClassPageRouteData = useRouteData();
 
-  const ListItemView = itemClass.views.listItemView;
+  const itemClass = itemClassConfiguration[itemClassID];
+  const ItemView = itemClass.views.listItemView ?? ((props) => <>{props?.itemID}</>);
+  const subregister = subregisterID ? subregisters[subregisterID] : undefined;
 
   return (
     <>
@@ -26,17 +29,20 @@ export default () => {
       <Container>
         <h2>Item class {itemClass.meta.title}</h2>
 
-        <div>
+        <ul>
           {items.map((item, idx) =>
-            <ListItemView
-              key={idx}
-              itemID={item.id}
-              itemData={item}
-              useRegisterItemData={useRegisterItemData}
-              getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
-            />
+            <li key={idx}>
+              <Link to={item.id} relative>
+                <ItemView
+                  itemID={item.id}
+                  itemData={item.data}
+                  useRegisterItemData={useRegisterItemData}
+                  getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+                />
+              </Link>
+            </li>
           )}
-        </div>
+        </ul>
       </Container>
     </>
   );

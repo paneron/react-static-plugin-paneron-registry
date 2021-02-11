@@ -19,17 +19,17 @@ export default () => {
   return (
     <>
       <Helmet>
-        <title>Subregister {subregister.title} — {register.name}</title>
+        <title>Subregister {subregister?.title ?? "<unnamed>"} — {register.name}</title>
       </Helmet>
 
       <Container>
-        <h2>{subregister.title}</h2>
+        <h2>{subregister?.title ?? "<unnamed>"}</h2>
 
         <h3>Item classes</h3>
 
         {subregister.itemClasses.map(itemClassID =>
-          <Link key={itemClassID} to={itemClassConfiguration[itemClassID].meta.id} relative>
-            {itemClassConfiguration[itemClassID].meta.title}
+          <Link key={itemClassID} to={itemClassConfiguration[itemClassID]?.meta?.id} relative>
+            {itemClassConfiguration[itemClassID]?.meta?.title}
           </Link>
         )}
 

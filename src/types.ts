@@ -1,5 +1,4 @@
 import type {
-  ItemClassConfiguration,
   ItemClassConfigurationSet,
   Register,
   RegisterItem,
@@ -16,6 +15,11 @@ export interface ReactStaticState {
     data: any
     [key: string]: any
   }[]
+}
+
+
+export interface DefaultPageProps {
+  itemClassConfiguration: ItemClassConfigurationSet
 }
 
 
@@ -42,8 +46,11 @@ export interface PluginConfig {
 
   itemClassConfiguration: ItemClassConfigurationSet
   subregisters: Subregisters
-  itemListPageTemplate?: string
+
+  itemClassPageTemplate?: string
   itemPageTemplate?: string
+  subregisterPageTemplate?: string
+  homePageTemplate?: string
 }
 
 
@@ -61,14 +68,18 @@ export interface RegistryStatistics {
 
 
 export interface ItemClassPageRouteData extends CommonRouteData {
-  subregister?: { title: string }
-  itemClass: ItemClassConfiguration<any>
+  itemClassID: string
+  subregisterID?: string
+
+  //subregister?: { title: string }
+  //itemClass: ItemClassConfiguration<any>
   items: RegisterItem<any>[]
   statistics?: RegistryStatistics
 }
 
 
 export interface SubregisterPageRouteData extends CommonRouteData {
+  subregisterID: string
   subregister: { title: string, itemClasses: string[] }
   statistics?: RegistryStatistics
 }

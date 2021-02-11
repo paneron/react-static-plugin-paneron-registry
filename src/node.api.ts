@@ -25,12 +25,6 @@ import SimpleCache from './SimpleCache';
 const cache = new SimpleCache();
 
 
-function getTemplate(what: string = 'RegisterItem'): string {
-  console.debug("Getting template", __dirname);
-  return path.join(__dirname, `Default${what}Page/index`);
-}
-
-
 interface ItemCache {
   itemID: string
   itemClassID: string
@@ -44,11 +38,33 @@ type ItemCallback = (item: ItemCache) => void
 
 export default ({
   datasetSourcePath, urlPrefix,
-  itemClassConfiguration, subregisters,
+  itemClassConfiguration,
+  subregisters,
   footerBanner, headerBanner, footerBannerLink,
+
+  itemClassPageTemplate,
+  itemPageTemplate,
+  subregisterPageTemplate,
+  homePageTemplate,
 }: PluginConfig) => {
 
   const itemCache: ItemCache[] = [];
+
+
+  function getTemplate(what: 'RegisterItem' | 'ItemClass' | 'Subregister' | 'Home'): string {
+    //console.debug("Getting template", __dirname, what);
+
+    if (what === 'RegisterItem' && itemPageTemplate) {
+      return itemPageTemplate;
+    } else if (what === 'ItemClass' && itemClassPageTemplate) {
+      return itemClassPageTemplate;
+    } else if (what === 'Subregister' && subregisterPageTemplate) {
+      return subregisterPageTemplate;
+    } else if (what === 'Home' && homePageTemplate) {
+      return homePageTemplate;
+    }
+    return path.join(__dirname, `Default${what}Page/index`);
+  }
 
   return {
 
@@ -92,7 +108,9 @@ export default ({
 
       if (hasSubregisters) {
         const subregDirents = dirTree(subregisterRoot).children || [];
-        registerContentRoutes = subregDirents.map(dirent => direntToSubregRoute(
+        registerContentRoutes = subregDirents.
+        filter(dirent => subregisters[dirent.name] !== undefined).
+        map(dirent => direntToSubregRoute(
           registerItem,
           dirent,
           subregisterTemplate,
@@ -195,7 +213,7 @@ function direntToItemClassRoute(
       classID,
       subregisterID,
     )),
-    getData: getItemClassPageRouteData(dirent, context),
+    getData: getItemClassPageRouteData(dirent, context, subregisterID),
   };
 }
 
@@ -226,10 +244,12 @@ function getSubregisterPageRouteData(
 ): () => Promise<SubregisterPageRouteData> {
   const subregisterID = dirent.name;
   const subregister = context.subregisters[subregisterID];
+  console.debug("Subregister data", subregisterID, subregister);
 
   return async () => {
     return {
       ...context,
+      subregisterID,
       subregister,
     };
   };
@@ -239,9 +259,10 @@ function getSubregisterPageRouteData(
 function getItemClassPageRouteData(
   dirent: DirectoryTree,
   context: CommonRouteData,
+  subregisterID?: string,
 ): () => Promise<ItemClassPageRouteData> {
-  const classID = dirent.name;
-  const itemClass = context.itemClassConfiguration[classID];
+  const itemClassID = dirent.name;
+  const itemClass = context.itemClassConfiguration[itemClassID];
   const itemPaths = (dirent.children ?? []).map(dirent => path.join(
     path.dirname(dirent.path),
     dirent.name));
@@ -251,6 +272,8 @@ function getItemClassPageRouteData(
 
     return {
       ...context,
+      itemClassID,
+      subregisterID,
       itemClass,
       items,
     };

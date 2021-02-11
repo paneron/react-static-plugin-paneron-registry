@@ -1,21 +1,20 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useRouteData } from 'react-static';
-import { RegisterItemPageRouteData } from '../types';
+import { DefaultPageProps, RegisterItemPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { useRegisterItemData, _getRelatedClass } from '../DefaultWidgets/helpers';
 
 
-export default () => {
+export default ({ itemClassConfiguration }: DefaultPageProps) => {
   const {
     register,
-    itemClassConfiguration,
     item,
     itemClassID,
   }: RegisterItemPageRouteData = useRouteData();
 
   const itemClass = itemClassConfiguration[itemClassID];
-  const DetailView = itemClass.views.detailView;
+  const DetailView = itemClass.views.detailView ?? ((props) => <>{JSON.stringify(props?.itemData)}</>);
 
   return (
     <>
@@ -25,7 +24,7 @@ export default () => {
 
       <Container>
         <DetailView
-          itemData={item}
+          itemData={item.data}
           useRegisterItemData={useRegisterItemData}
           getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
         />

@@ -14,7 +14,7 @@ const ItemClassNav: React.FC<{
 
   return <ul>
     {itemClassIDs.map(itemClassID =>
-      <li>
+      <li key={itemClassID}>
         <Link to={itemClassID} relative={relative}>
           {itemClassConfiguration[itemClassID].meta.title}
         </Link>
@@ -49,7 +49,7 @@ export default () => {
     nav = (
       <>
         {Object.entries(subregisters).map(([subregID, subregData]) =>
-          <div>
+          <div key={subregID}>
             <Link to={subregID} relative={prefix}>{subregData.title}</Link>
             <ItemClassNav
               relative={`${prefix}/${subregID}`}

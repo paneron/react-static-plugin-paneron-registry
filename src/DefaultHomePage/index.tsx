@@ -35,7 +35,7 @@ export default () => {
           <dt>Alternative languages</dt>
           <dd>
             {register.alternativeLanguages
-              ? register.alternativeLanguages.map(l => <Locale locale={l} />)
+              ? register.alternativeLanguages.map((l, idx) => <Locale key={idx} locale={l} />)
               : 'N/A'}
           </dd>
         </dl>

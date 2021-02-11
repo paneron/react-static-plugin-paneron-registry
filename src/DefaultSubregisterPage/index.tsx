@@ -28,7 +28,7 @@ export default () => {
         <h3>Item classes</h3>
 
         {subregister.itemClasses.map(itemClassID =>
-          <Link to={itemClassConfiguration[itemClassID].meta.id} relative>
+          <Link key={itemClassID} to={itemClassConfiguration[itemClassID].meta.id} relative>
             {itemClassConfiguration[itemClassID].meta.title}
           </Link>
         )}

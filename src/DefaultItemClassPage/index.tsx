@@ -27,8 +27,9 @@ export default () => {
         <h2>Item class {itemClass.meta.title}</h2>
 
         <div>
-          {items.map(item =>
+          {items.map((item, idx) =>
             <ListItemView
+              key={idx}
               itemID={item.id}
               itemData={item}
               useRegisterItemData={useRegisterItemData}

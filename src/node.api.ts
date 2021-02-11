@@ -71,7 +71,7 @@ export default ({
       const registerItem: ItemCallback = function (item: ItemCache) {
         itemCache.push(item);
         statistics.totalItemCount += 1;
-        console.debug("Registered item in cache", item, statistics.totalItemCount);
+        //console.debug("Registered item in cache", item, statistics.totalItemCount);
       }
 
       const commonRouteData: CommonRouteData = {

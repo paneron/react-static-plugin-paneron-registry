@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { execSync as shell } from 'child_process';
+//import { execSync as shell } from 'child_process';
 import path from 'path';
 import dirTree, { DirectoryTree } from 'directory-tree';
 import yaml from 'js-yaml';
@@ -26,11 +26,8 @@ const cache = new SimpleCache();
 
 
 function getTemplate(what: string = 'RegisterItem'): string {
-  const _defaultTemplateSrc = path.join(__dirname, `Default${what}Page`);
-  const _defaultTemplate = path.join(process.cwd(), `_${what}Page`);
-  shell(`mkdir -p "${_defaultTemplate}"`);
-  shell(`cp -r "${_defaultTemplateSrc}/"* "${_defaultTemplate}"`)
-  return `_${what}Page/index`;
+  console.debug("Getting template", __dirname);
+  return path.join(__dirname, `Default${what}Page/index`);
 }
 
 

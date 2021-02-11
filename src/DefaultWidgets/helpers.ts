@@ -35,7 +35,7 @@ export const useRegisterItemData: RegisterItemDataHook = (paths: ObjectDataReque
     (async () => {
       try {
         const data = (
-          await Promise.all(requestedPaths.map(async (p) => ({ [p]: axios.get(`/${p}/item.json`) })))
+          await Promise.all(requestedPaths.map(async (p) => ({ [p]: await axios.get(`/${p}/item.json`) })))
         ).reduce((prev, curr) => ({ ...prev, ...curr }), {});
         setData(data);
         setErrors([]);

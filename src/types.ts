@@ -36,9 +36,9 @@ export interface CommonRouteData {
 export interface PluginConfig {
   datasetSourcePath: string
   urlPrefix: string
-  headerBanner: string
-  footerBanner: string
-  footerBannerLink: string
+  headerBanner?: string
+  footerBanner?: string
+  footerBannerLink?: string
 
   itemClassConfiguration: ItemClassConfigurationSet
   subregisters: Subregisters

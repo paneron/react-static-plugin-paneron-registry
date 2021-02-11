@@ -6,7 +6,7 @@ import yaml from 'js-yaml';
 
 import { Route } from 'react-static';
 
-import { RegisterItem } from '@riboseinc/paneron-registry-kit/types';
+import type { Register, RegisterItem } from '@riboseinc/paneron-registry-kit/types';
 
 import {
   ReactStaticState,
@@ -20,7 +20,6 @@ import {
 } from './types';
 
 import SimpleCache from './SimpleCache';
-
 
 
 const cache = new SimpleCache();
@@ -57,14 +56,18 @@ export default ({
 
       let registerContentRoutes: Route[];
 
+      const register = await getFileData<Register>(path.join(datasetSourcePath, 'register.yaml'));
+
       const commonRouteData: CommonRouteData = {
         siteURLPrefix: _state.config.basePath || '',
         registerURLPrefix: urlPrefix,
+        register,
         subregisters,
         itemClassConfiguration,
         headerBanner,
         footerBanner,
         footerBannerLink,
+        hasSubregisters,
       };
 
       const itemTemplate = getTemplate('RegisterItem');
@@ -94,6 +97,7 @@ export default ({
           path: urlPrefix,
           template: getTemplate('Home'),
           getData: async (): Promise<MainRegistryPageRouteData> => ({
+            ...commonRouteData,
             statistics,
           }),
         },
@@ -167,7 +171,7 @@ function direntToItemRoute(
   return {
     path: itemID,
     template: itemTemplate,
-    getData: getItemPageRouteData(dirent, context),
+    getData: getItemPageRouteData(dirent, context, itemClassID, subregisterID),
   };
 }
 
@@ -211,6 +215,8 @@ function getItemClassPageRouteData(
 function getItemPageRouteData(
   dirent: DirectoryTree,
   context: CommonRouteData,
+  itemClassID: string,
+  subregisterID?: string,
 ): () => Promise<RegisterItemPageRouteData> {
 
   return async () => {
@@ -219,6 +225,8 @@ function getItemPageRouteData(
 
     return {
       ...context,
+      itemClassID,
+      subregisterID,
       item,
     };
   };

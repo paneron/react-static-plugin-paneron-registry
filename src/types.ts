@@ -1,4 +1,10 @@
-import type { ItemClassConfiguration, ItemClassConfigurationSet, RegisterItem, Subregisters } from '@riboseinc/paneron-registry-kit/types';
+import type {
+  ItemClassConfiguration,
+  ItemClassConfigurationSet,
+  Register,
+  RegisterItem,
+  Subregisters,
+} from '@riboseinc/paneron-registry-kit/types';
 
 
 export interface ReactStaticState {
@@ -13,7 +19,6 @@ export interface ReactStaticState {
 }
 
 
-
 export interface CommonRouteData {
   siteURLPrefix: string
   registerURLPrefix: string
@@ -21,8 +26,10 @@ export interface CommonRouteData {
   headerBanner: string
   footerBannerLink: string
 
+  register: Register
   itemClassConfiguration: ItemClassConfigurationSet
   subregisters: Subregisters
+  hasSubregisters: boolean
 }
 
 
@@ -42,6 +49,9 @@ export interface PluginConfig {
 
 export interface RegisterItemPageRouteData extends CommonRouteData {
   item: RegisterItem<any>
+
+  subregisterID?: string
+  itemClassID: string
 }
 
 
@@ -64,6 +74,6 @@ export interface SubregisterPageRouteData extends CommonRouteData {
 }
 
 
-export interface MainRegistryPageRouteData {
+export interface MainRegistryPageRouteData extends CommonRouteData {
   statistics: RegistryStatistics
 }

@@ -52,7 +52,7 @@ export default () => {
           <div key={subregID}>
             <Link to={subregID} relative={prefix}>{subregData.title}</Link>
             <ItemClassNav
-              relative={`${prefix}/${subregID}`}
+              relative={`${prefix}/${subregID}/`}
               itemClassIDs={subregData.itemClasses}
             />
           </div>

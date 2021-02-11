@@ -22,9 +22,9 @@ export interface ReactStaticState {
 export interface CommonRouteData {
   siteURLPrefix: string
   registerURLPrefix: string
-  footerBanner: string
-  headerBanner: string
-  footerBannerLink: string
+  footerBanner?: string
+  headerBanner?: string
+  footerBannerLink?: string
 
   register: Register
   itemClassConfiguration: ItemClassConfigurationSet

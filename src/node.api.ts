@@ -34,11 +34,24 @@ function getTemplate(what: string = 'RegisterItem'): string {
 }
 
 
+interface ItemCache {
+  itemID: string
+  itemClassID: string
+  subregisterID?: string
+  dataPath: string
+}
+
+
+type ItemCallback = (item: ItemCache) => void
+
+
 export default ({
   datasetSourcePath, urlPrefix,
   itemClassConfiguration, subregisters,
   footerBanner, headerBanner, footerBannerLink,
 }: PluginConfig) => {
+
+  const itemCache: ItemCache[] = [];
 
   return {
 
@@ -57,6 +70,12 @@ export default ({
       let registerContentRoutes: Route[];
 
       const register = await getFileData<Register>(path.join(datasetSourcePath, 'register.yaml'));
+
+      const registerItem: ItemCallback = function (item: ItemCache) {
+        itemCache.push(item);
+        statistics.totalItemCount += 1;
+        console.debug("Registered item in cache", item, statistics.totalItemCount);
+      }
 
       const commonRouteData: CommonRouteData = {
         siteURLPrefix: _state.config.basePath || '',
@@ -77,6 +96,7 @@ export default ({
       if (hasSubregisters) {
         const subregDirents = dirTree(subregisterRoot).children || [];
         registerContentRoutes = subregDirents.map(dirent => direntToSubregRoute(
+          registerItem,
           dirent,
           subregisterTemplate,
           itemClassTemplate,
@@ -85,6 +105,7 @@ export default ({
       } else {
         const itemClassDirents = dirTree(datasetSourcePath, { attributes: ['isDirectory'] }).children || [];
         registerContentRoutes = itemClassDirents.map(dirent => direntToItemClassRoute(
+          registerItem,
           dirent,
           itemClassTemplate,
           itemTemplate,
@@ -106,12 +127,32 @@ export default ({
 
       return routes;
     },
+
+    afterExport: async (state: ReactStaticState) => {
+      const registerOutPrefix = `dist/${urlPrefix}`;
+
+      for (const cachedItem of itemCache) {
+        const itemData = await getFileData<RegisterItem<any>>(cachedItem.dataPath);
+        const itemJSONDirPath = cachedItem.subregisterID
+          ? path.join(registerOutPrefix, cachedItem.subregisterID, cachedItem.itemClassID)
+          : path.join(registerOutPrefix, cachedItem.itemClassID);
+        const itemJSONPath = path.join(itemJSONDirPath, `${cachedItem.itemID}.json`);
+        const itemJSON = JSON.stringify(itemData);
+
+        fs.mkdirSync(itemJSONDirPath, { recursive: true });
+        fs.writeFileSync(itemJSONPath, itemJSON, 'utf8');
+      }
+
+      return state;
+    },
+
   };
 
 };
 
 
 function direntToSubregRoute(
+  registerItem: ItemCallback,
   dirent: DirectoryTree,
   subregisterTemplate: string,
   itemClassTemplate: string,
@@ -124,6 +165,7 @@ function direntToSubregRoute(
     path: subregisterID,
     template: subregisterTemplate,
     children: (dirent.children ?? []).map(dirent => direntToItemClassRoute(
+      registerItem,
       dirent,
       itemClassTemplate,
       itemTemplate,
@@ -136,6 +178,7 @@ function direntToSubregRoute(
 
 
 function direntToItemClassRoute(
+  registerItem: ItemCallback,
   dirent: DirectoryTree,
   itemClassTemplate: string,
   itemTemplate: string,
@@ -148,6 +191,7 @@ function direntToItemClassRoute(
     path: classID,
     template: itemClassTemplate,
     children: (dirent.children ?? []).map(dirent => direntToItemRoute(
+      registerItem,
       dirent,
       itemTemplate,
       context,
@@ -160,6 +204,7 @@ function direntToItemClassRoute(
 
 
 function direntToItemRoute(
+  registerItem: ItemCallback,
   dirent: DirectoryTree,
   itemTemplate: string,
   context: CommonRouteData,
@@ -167,6 +212,8 @@ function direntToItemRoute(
   subregisterID?: string,
 ): Route {
   const itemID = noExt(dirent.name);
+
+  registerItem({ itemID, itemClassID, subregisterID, dataPath: dirent.path });
 
   return {
     path: itemID,

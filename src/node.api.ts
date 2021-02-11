@@ -115,7 +115,7 @@ export default ({
       let routes: Route[] = [
         ...routesBefore,
         {
-          path: urlPrefix,
+          path: urlPrefix || '/',
           template: getTemplate('Home'),
           getData: async (): Promise<MainRegistryPageRouteData> => ({
             ...commonRouteData,

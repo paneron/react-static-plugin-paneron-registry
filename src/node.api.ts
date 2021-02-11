@@ -121,8 +121,8 @@ export default ({
             ...commonRouteData,
             statistics,
           }),
+          children: registerContentRoutes,
         },
-        ...registerContentRoutes,
       ];
 
       return routes;

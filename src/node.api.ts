@@ -245,7 +245,9 @@ function getItemClassPageRouteData(
 ): () => Promise<ItemClassPageRouteData> {
   const classID = dirent.name;
   const itemClass = context.itemClassConfiguration[classID];
-  const itemPaths = (dirent.children ?? []).map(dirent => noExt(dirent.name));
+  const itemPaths = (dirent.children ?? []).map(dirent => path.join(
+    path.dirname(dirent.path),
+    dirent.name));
 
   return async () => {
     const items = await Promise.all(itemPaths.map(async (itemPath) => await getFileData<RegisterItem<any>>(itemPath)));

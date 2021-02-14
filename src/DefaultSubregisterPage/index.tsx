@@ -27,11 +27,15 @@ export default () => {
 
         <h3>Item classes</h3>
 
-        {subregister.itemClasses.map(itemClassID =>
-          <Link key={itemClassID} to={itemClassConfiguration[itemClassID]?.meta?.id} relative>
-            {itemClassConfiguration[itemClassID]?.meta?.title}
-          </Link>
-        )}
+        <ul>
+          {subregister.itemClasses.map(itemClassID =>
+            <li key={itemClassID}>
+              <Link to={itemClassConfiguration[itemClassID]?.meta?.id} relative>
+                {itemClassConfiguration[itemClassID]?.meta?.title}
+              </Link>
+            </li>
+          )}
+        </ul>
 
         {statistics
           ? <RegistryStats stats={statistics} />

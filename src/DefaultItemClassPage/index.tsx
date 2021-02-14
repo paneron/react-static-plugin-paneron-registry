@@ -27,7 +27,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
       </Helmet>
 
       <Container>
-        <h2>Item class {itemClass.meta.title}</h2>
+        <h2>Item class: {itemClass.meta.title}</h2>
 
         <ul>
           {items.map((item, idx) =>

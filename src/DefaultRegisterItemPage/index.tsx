@@ -23,6 +23,8 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
       </Helmet>
 
       <Container>
+        <h2>{itemClass.meta.title} {item.id}</h2>
+
         <DetailView
           itemData={item.data}
           useRegisterItemData={useRegisterItemData}

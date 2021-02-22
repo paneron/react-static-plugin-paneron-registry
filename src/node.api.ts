@@ -4,8 +4,7 @@ import path from 'path';
 import dirTree, { DirectoryTree } from 'directory-tree';
 import yaml from 'js-yaml';
 
-import { Route } from 'react-static';
-
+import type { Route } from 'react-static';
 import type { Register, RegisterItem } from '@riboseinc/paneron-registry-kit/types';
 
 import {

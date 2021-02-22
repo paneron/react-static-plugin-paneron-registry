@@ -106,9 +106,14 @@ export default ({
       const subregisterTemplate = getTemplate('Subregister');
 
       if (hasSubregisters) {
-        const subregDirents = dirTree(subregisterRoot).children ?? [];
+        const subregDirents = (dirTree(subregisterRoot).children ?? []).
+          filter(dirent => subregisters[dirent.name] !== undefined);
+        for (const subregID of Object.keys(commonRouteData.subregisters)) {
+          if (!subregDirents.find(dirent => dirent.name === subregID)) {
+            delete commonRouteData.subregisters[subregID];
+          }
+        }
         registerContentRoutes = subregDirents.
-          filter(dirent => subregisters[dirent.name] !== undefined).
           map(dirent => direntToSubregRoute(
             registerItem,
             dirent,
@@ -117,6 +122,7 @@ export default ({
             itemTemplate,
             commonRouteData));
       } else {
+        commonRouteData.subregisters = {};
         const itemClassDirents = dirTree(
           datasetSourcePath,
           { attributes: ['isDirectory'] },

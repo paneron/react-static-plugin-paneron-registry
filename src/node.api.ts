@@ -216,7 +216,6 @@ function direntToItemClassRoute(
     path: classID,
     template: itemClassTemplate,
     children: (dirent.children ?? []).
-      slice(0, 10).
       map(dirent => direntToItemRoute(
         registerItem,
         dirent,
@@ -275,7 +274,6 @@ function getItemClassPageRouteData(
   const itemClassID = dirent.name;
   const itemClass = context.itemClassConfiguration[itemClassID];
   const itemPaths = (dirent.children ?? []).
-    slice(0, 10).
     map(dirent => path.join(
       path.dirname(dirent.path),
       dirent.name));

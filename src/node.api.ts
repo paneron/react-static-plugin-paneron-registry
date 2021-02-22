@@ -243,7 +243,6 @@ function getSubregisterPageRouteData(
 ): () => Promise<SubregisterPageRouteData> {
   const subregisterID = dirent.name;
   const subregister = context.subregisters[subregisterID];
-  console.debug("Subregister data", subregisterID, subregister);
 
   return async () => {
     return {

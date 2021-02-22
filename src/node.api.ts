@@ -106,24 +106,28 @@ export default ({
       const subregisterTemplate = getTemplate('Subregister');
 
       if (hasSubregisters) {
-        const subregDirents = dirTree(subregisterRoot).children || [];
+        const subregDirents = dirTree(subregisterRoot).children ?? [];
         registerContentRoutes = subregDirents.
-        filter(dirent => subregisters[dirent.name] !== undefined).
-        map(dirent => direntToSubregRoute(
-          registerItem,
-          dirent,
-          subregisterTemplate,
-          itemClassTemplate,
-          itemTemplate,
-          commonRouteData));
+          filter(dirent => subregisters[dirent.name] !== undefined).
+          map(dirent => direntToSubregRoute(
+            registerItem,
+            dirent,
+            subregisterTemplate,
+            itemClassTemplate,
+            itemTemplate,
+            commonRouteData));
       } else {
-        const itemClassDirents = dirTree(datasetSourcePath, { attributes: ['isDirectory'] }).children || [];
-        registerContentRoutes = itemClassDirents.map(dirent => direntToItemClassRoute(
-          registerItem,
-          dirent,
-          itemClassTemplate,
-          itemTemplate,
-          commonRouteData));
+        const itemClassDirents = dirTree(
+          datasetSourcePath,
+          { attributes: ['isDirectory'] },
+        ).children ?? [];
+        registerContentRoutes = itemClassDirents.
+          map(dirent => direntToItemClassRoute(
+            registerItem,
+            dirent,
+            itemClassTemplate,
+            itemTemplate,
+            commonRouteData));
       }
 
       let routes: Route[] = [
@@ -178,14 +182,15 @@ function direntToSubregRoute(
   return {
     path: subregisterID,
     template: subregisterTemplate,
-    children: (dirent.children ?? []).map(dirent => direntToItemClassRoute(
-      registerItem,
-      dirent,
-      itemClassTemplate,
-      itemTemplate,
-      context,
-      subregisterID,
-    )),
+    children: (dirent.children ?? []).
+      map(dirent => direntToItemClassRoute(
+        registerItem,
+        dirent,
+        itemClassTemplate,
+        itemTemplate,
+        context,
+        subregisterID,
+      )),
     getData: getSubregisterPageRouteData(dirent, context),
   };
 }
@@ -204,14 +209,16 @@ function direntToItemClassRoute(
   return {
     path: classID,
     template: itemClassTemplate,
-    children: (dirent.children ?? []).map(dirent => direntToItemRoute(
-      registerItem,
-      dirent,
-      itemTemplate,
-      context,
-      classID,
-      subregisterID,
-    )),
+    children: (dirent.children ?? []).
+      slice(0, 10).
+      map(dirent => direntToItemRoute(
+        registerItem,
+        dirent,
+        itemTemplate,
+        context,
+        classID,
+        subregisterID,
+      )),
     getData: getItemClassPageRouteData(dirent, context, subregisterID),
   };
 }
@@ -261,9 +268,11 @@ function getItemClassPageRouteData(
 ): () => Promise<ItemClassPageRouteData> {
   const itemClassID = dirent.name;
   const itemClass = context.itemClassConfiguration[itemClassID];
-  const itemPaths = (dirent.children ?? []).map(dirent => path.join(
-    path.dirname(dirent.path),
-    dirent.name));
+  const itemPaths = (dirent.children ?? []).
+    slice(0, 10).
+    map(dirent => path.join(
+      path.dirname(dirent.path),
+      dirent.name));
 
   return async () => {
     const items = await Promise.all(itemPaths.map(async (itemPath) => await getFileData<RegisterItem<any>>(itemPath)));

@@ -22,6 +22,15 @@ export const _getRelatedClass = (classes: Record<string, ItemClassConfiguration<
 };
 
 
+function itemPathToJSONPath(itemPath: string) {
+  if (itemPath.startsWith('subregisters')) {
+    return `/${itemPath.replace('subregisters/', '')}/item.json`;
+  } else {
+    return `/${itemPath}/item.json`;
+  }
+}
+
+
 //export function makeRegisterItemDataHook(baseURL: string): RegisterItemDataHook {
 
 export const useRegisterItemData: RegisterItemDataHook = (paths: ObjectDataRequest) => {
@@ -35,7 +44,9 @@ export const useRegisterItemData: RegisterItemDataHook = (paths: ObjectDataReque
     (async () => {
       try {
         const data = (
-          await Promise.all(requestedPaths.map(async (p) => ({ [p]: await axios.get(`/${p}/item.json`) })))
+          await Promise.all(requestedPaths.map(async (p) => ({
+            [p]: await axios.get(itemPathToJSONPath(p)),
+          })))
         ).reduce((prev, curr) => ({ ...prev, ...curr }), {});
         setData(data);
         setErrors([]);

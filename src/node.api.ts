@@ -152,9 +152,9 @@ export default ({
       for (const cachedItem of itemCache) {
         const itemData = await getFileData<RegisterItem<any>>(cachedItem.dataPath);
         const itemJSONDirPath = cachedItem.subregisterID
-          ? path.join(registerOutPrefix, cachedItem.subregisterID, cachedItem.itemClassID)
-          : path.join(registerOutPrefix, cachedItem.itemClassID);
-        const itemJSONPath = path.join(itemJSONDirPath, `${cachedItem.itemID}.json`);
+          ? path.join(registerOutPrefix, cachedItem.subregisterID, cachedItem.itemClassID, cachedItem.itemID)
+          : path.join(registerOutPrefix, cachedItem.itemClassID, cachedItem.itemID);
+        const itemJSONPath = path.join(itemJSONDirPath, 'item.json');
         const itemJSON = JSON.stringify(itemData);
 
         fs.mkdirSync(itemJSONDirPath, { recursive: true });

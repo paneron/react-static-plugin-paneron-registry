@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useRouteData } from 'react-static';
+import { Tag, Breadcrumbs, IBreadcrumbProps } from '@blueprintjs/core';
 import Container from '../DefaultWidgets/Container';
 import { _getRelatedClass } from '../DefaultWidgets/helpers';
 import { SubregisterPageRouteData } from '../types';
@@ -16,6 +17,12 @@ export default () => {
     statistics,
   }: SubregisterPageRouteData = useRouteData();
 
+  const breadcrumbs: IBreadcrumbProps[] = [{
+      icon: 'folder-open',
+      current: true,
+      text: <><Tag minimal>Subregister</Tag>&nbsp;{subregister.title}</>,
+    }];
+
   return (
     <>
       <Helmet>
@@ -23,7 +30,7 @@ export default () => {
       </Helmet>
 
       <Container>
-        <h2>{subregister?.title ?? "<unnamed>"}</h2>
+        <Breadcrumbs items={breadcrumbs} />
 
         <h3>Item classes</h3>
 

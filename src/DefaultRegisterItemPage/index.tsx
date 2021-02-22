@@ -14,7 +14,10 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   }: RegisterItemPageRouteData = useRouteData();
 
   const itemClass = itemClassConfiguration[itemClassID];
-  const DetailView = itemClass.views.detailView ?? ((props) => <>{JSON.stringify(props?.itemData)}</>);
+  const DetailView = (
+    itemClass.views.detailView ??
+    itemClass.views.editView ??
+    ((props) => <>{JSON.stringify(props?.itemData)}</>));
 
   return (
     <>

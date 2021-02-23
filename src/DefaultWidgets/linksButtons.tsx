@@ -32,9 +32,15 @@ export function normalizeInternalHRef(loc: string, to: string, relative?: string
   const locWithoutSlashes = withoutTrailingSlashes(loc);
   const prefix = _relative === true
     ? `/${locWithoutSlashes}${locWithoutSlashes !== '' ? '/' : ''}`
-    : (_relative || '/');
+    : to === '/'
+      ? ''
+      : _relative
+        ? _relative
+        : '/';
 
-  return `${prefix}${withoutTrailingSlashes(to)}${trailingSlash ? '/' : ''}`;
+  const normalized = `${prefix}${withoutTrailingSlashes(to)}${trailingSlash ? '/' : ''}`;
+
+  return normalized;
 }
 
 

@@ -3,6 +3,7 @@ import { Link as RouterLink, useLocation } from '@reach/router';
 import { useRoutePath } from 'react-static';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
+import { Classes, Icon, IconName } from '@blueprintjs/core';
 
 
 const scale = chroma.scale(['#55aadd', 'hotpink']).colors(5, null);
@@ -54,6 +55,7 @@ export function useInternalLinkCurrentState(normalizedPath: string): boolean {
 export interface LinkProps {
   to: string
   relative?: string | boolean
+  external?: true
   unstyled?: boolean
   disabled?: boolean
   title?: string
@@ -61,11 +63,11 @@ export interface LinkProps {
   style?: React.CSSProperties
 }
 export const Link: React.FC<LinkProps> =
-function ({ to, relative, unstyled, disabled, title, className, style, children }) {
+function ({ to, relative, external, unstyled, disabled, title, className, style, children }) {
   const _to = normalizeInternalHRef(useLocation().pathname, to, relative);
   const isActive = useInternalLinkCurrentState(_to);
 
-  if (to?.startsWith('http') || disabled) {
+  if (to?.startsWith('http') || disabled || external) {
     return (
       <a
           title={title}
@@ -89,6 +91,18 @@ function ({ to, relative, unstyled, disabled, title, className, style, children 
     );
   }
 }
+
+
+export const ButtonLink: React.FC<LinkProps & { icon?: IconName }> =
+function ({ icon, children, ...props }) {
+  const className = `${props.className ?? ''} ${Classes.BUTTON}`;
+  return (
+    <UnstyledLink {...props} className={className}>
+      {icon ? <Icon icon={icon} /> : null}
+      <span className={Classes.BUTTON_TEXT}>{children}</span>
+    </UnstyledLink>
+  );
+};
 
 
 const InternalLink = styled(RouterLink)`
@@ -122,13 +136,20 @@ const InternalLink = styled(RouterLink)`
 `;
 
 
-export const UnstyledLink = styled(Link)`
+export const DiscretelyStyledLink = styled(Link)`
   border-bottom: none;
   color: inherit;
 
   &:hover {
     border-bottom: none;
     text-decoration: underline;
+  }
+`;
+
+
+export const UnstyledLink = styled(DiscretelyStyledLink)`
+  &:hover {
+    text-decoration: none;
   }
 `;
 

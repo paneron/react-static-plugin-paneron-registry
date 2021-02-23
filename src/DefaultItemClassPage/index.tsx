@@ -27,7 +27,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   }
 
   const breadcrumbs: IBreadcrumbProps[] = [{
-    icon: 'application',
+    icon: 'cube',
     current: true,
     text: <>{itemClass.meta.title}</>,
   }];

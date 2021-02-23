@@ -27,7 +27,7 @@ const ContainerWrapperDiv = styled.div`
   right: 0;
   left: 0;
   overfow-y: auto;
-  padding-top: 50px;
+  padding-top: 60px;
 `;
 
 
@@ -52,6 +52,11 @@ const BreadcrumbsStyled = styled(Breadcrumbs)`
 `;
 
 
+const Heading = styled(NavbarHeading)`
+  white-space: nowrap;
+`;
+
+
 const MATHJAX_SCRIPT = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=AM_HTMLorMML";
 
 
@@ -63,9 +68,9 @@ function ({ children, breadcrumbs }) {
     <ContainerWrapperDiv>
       <Navbar fixedToTop>
         <NavbarGroup>
-          <NavbarHeading>
+          <Heading>
             {register.name}
-          </NavbarHeading>
+          </Heading>
           <NavbarDivider />
           <HeaderLink to="/" className={`${Classes.BUTTON} ${Classes.MINIMAL} ${Classes.ICON}`}><Icon icon="home" /><span className={Classes.BUTTON_TEXT}>Home</span></HeaderLink>
           {(breadcrumbs ?? []).length > 0

@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { navigate } from '@reach/router';
 import { useRouteData } from 'react-static';
-import { Text, IBreadcrumbProps } from '@blueprintjs/core';
+import { Text, IBreadcrumbProps, Classes } from '@blueprintjs/core';
 import { DefaultPageProps, RegisterItemPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { BrowserCtx } from '@riboseinc/paneron-registry-kit/views/util';
@@ -55,7 +55,16 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   }, {
     current: true,
     icon: 'document',
-    text: <><small><Text ellipsize>{item.id}</Text></small></>,
+    text: <>
+      <ItemView
+        itemData={item.data}
+        itemID={item.id} 
+        useRegisterItemData={useRegisterItemData}
+        subregisterID={subregisterID}
+        getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)} />
+      &nbsp;
+      <small className={Classes.TEXT_MUTED}><Text ellipsize>{item.id}</Text></small>
+    </>,
   }];
 
   if (subregisterID) {
@@ -74,15 +83,6 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
       </Helmet>
 
       <Container breadcrumbs={breadcrumbs}>
-        <h2>
-          <ItemView
-            itemData={item.data}
-            itemID={item.id} 
-            useRegisterItemData={useRegisterItemData}
-            subregisterID={subregisterID}
-            getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)} />
-        </h2>
-
         <DetailView
           itemData={item.data}
           useRegisterItemData={useRegisterItemData}

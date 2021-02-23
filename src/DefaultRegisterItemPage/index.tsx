@@ -7,6 +7,7 @@ import { DefaultPageProps, RegisterItemPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { BrowserCtx } from '@riboseinc/paneron-registry-kit/views/util';
 import { useRegisterItemData, _getRelatedClass } from '../DefaultWidgets/helpers';
+import { ButtonLink } from '../DefaultWidgets/linksButtons';
 
 
 export default ({ itemClassConfiguration }: DefaultPageProps) => {
@@ -46,6 +47,8 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   function navigateToSubregister() {
     navigate(`/${subregisterID}`);
   }
+
+  const jsonHref = './item.json';
 
   const breadcrumbs: IBreadcrumbProps[] = [{
     onClick: navigateToClass,
@@ -89,6 +92,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
           getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
           subregisterID={subregisterID}
         />
+        <ButtonLink to={jsonHref} external>Get as JSON</ButtonLink>
       </Container>
     </BrowserCtx.Provider>
   );

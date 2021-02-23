@@ -29,6 +29,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   const breadcrumbs: IBreadcrumbProps[] = [{
     icon: 'cube',
     current: true,
+    intent: 'primary',
     text: <>{itemClass.meta.title}</>,
   }];
 
@@ -47,7 +48,10 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
         <title>{itemClass.meta.title}{subregister ? ` in ${subregister.title}` : ''} — {register.name}</title>
       </Helmet>
 
-      <Container breadcrumbs={breadcrumbs}>
+      <Container
+          breadcrumbs={breadcrumbs}
+          title={itemClass.meta.title}
+          contentType={{ icon: 'folder-open', name: "Item class" }}>
         <ul>
           {items.map((item, idx) =>
             <li key={idx}>

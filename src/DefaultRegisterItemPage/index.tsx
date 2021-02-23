@@ -2,12 +2,13 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { navigate } from '@reach/router';
 import { useRouteData } from 'react-static';
-import { Text, IBreadcrumbProps, Classes } from '@blueprintjs/core';
+import { ButtonGroup, FormGroup, IBreadcrumbProps, H5 } from '@blueprintjs/core';
 import { DefaultPageProps, RegisterItemPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { BrowserCtx } from '@riboseinc/paneron-registry-kit/views/util';
 import { useRegisterItemData, _getRelatedClass } from '../DefaultWidgets/helpers';
 import { ButtonLink } from '../DefaultWidgets/linksButtons';
+import { ItemCard } from '../DefaultWidgets/Card';
 
 
 export default ({ itemClassConfiguration }: DefaultPageProps) => {
@@ -50,6 +51,13 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
 
   const jsonHref = './item.json';
 
+  const itemView = <ItemView
+    itemData={item.data}
+    itemID={item.id} 
+    useRegisterItemData={useRegisterItemData}
+    subregisterID={subregisterID}
+    getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)} />;
+
   const breadcrumbs: IBreadcrumbProps[] = [{
     onClick: navigateToClass,
     icon: 'cube',
@@ -57,17 +65,9 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
     text: <>&nbsp;{itemClass.meta.title}</>,
   }, {
     current: true,
+    intent: 'primary',
     icon: 'document',
-    text: <>
-      <ItemView
-        itemData={item.data}
-        itemID={item.id} 
-        useRegisterItemData={useRegisterItemData}
-        subregisterID={subregisterID}
-        getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)} />
-      &nbsp;
-      <small className={Classes.TEXT_MUTED}><Text ellipsize>{item.id}</Text></small>
-    </>,
+    text: itemView,
   }];
 
   if (subregisterID) {
@@ -85,14 +85,54 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
         <title>Item {item.id} — {register.name}</title>
       </Helmet>
 
-      <Container breadcrumbs={breadcrumbs}>
-        <DetailView
-          itemData={item.data}
-          useRegisterItemData={useRegisterItemData}
-          getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
-          subregisterID={subregisterID}
-        />
-        <ButtonLink to={jsonHref} external>Get as JSON</ButtonLink>
+      <Container
+          breadcrumbs={breadcrumbs}
+          metaBlocks={[{
+            title: "Normative status",
+            content: <>
+              <FormGroup label="Normative status:">
+                {item.status}
+              </FormGroup>
+              <FormGroup label="Date accepted:">
+                {item.dateAccepted}
+              </FormGroup>
+            </>,
+          }, {
+            title: "Class",
+            icon: 'cube',
+            content: <>
+              <H5>{itemClass.meta.title}</H5>
+              <p>{itemClass.meta.description}</p>
+            </>,
+          }, {
+            title: "Registration",
+            content: <>
+              {subregisterID
+                ? <FormGroup label="Subregister:">
+                    {subregisters[subregisterID].title}
+                  </FormGroup>
+                : null}
+              <FormGroup label="Item ID:">
+                {item.id}
+              </FormGroup>
+            </>,
+          }, {
+            title: "In other formats",
+            content: <>
+              <ButtonGroup vertical fill style={{ marginBottom: '1em', }}>
+                <ButtonLink to={jsonHref} external>Get as JSON</ButtonLink>
+              </ButtonGroup>
+            </>,
+          }]}
+          contentType={{ icon: 'document', name: "Item" }}>
+        <ItemCard elevation={3}>
+          <DetailView
+            itemData={item.data}
+            useRegisterItemData={useRegisterItemData}
+            getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+            subregisterID={subregisterID}
+          />
+        </ItemCard>
       </Container>
     </BrowserCtx.Provider>
   );

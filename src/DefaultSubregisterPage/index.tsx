@@ -6,7 +6,7 @@ import Container from '../DefaultWidgets/Container';
 import { _getRelatedClass } from '../DefaultWidgets/helpers';
 import { SubregisterPageRouteData } from '../types';
 import RegistryStats from '../DefaultWidgets/RegistryStats';
-import { Link } from '../DefaultWidgets/linksButtons';
+import ItemClassCard from '../DefaultWidgets/ItemClassCard';
 
 
 export default () => {
@@ -20,6 +20,7 @@ export default () => {
   const breadcrumbs: IBreadcrumbProps[] = [{
     icon: 'folder-open',
     current: true,
+    intent: 'primary',
     text: <>{subregister.title}</>,
   }];
 
@@ -29,16 +30,13 @@ export default () => {
         <title>{subregister?.title ?? "<unnamed subregister>"} — {register.name}</title>
       </Helmet>
 
-      <Container breadcrumbs={breadcrumbs}>
-        <ul>
-          {subregister.itemClasses.map(itemClassID =>
-            <li key={itemClassID}>
-              <Link to={itemClassConfiguration[itemClassID]?.meta?.id} relative>
-                {itemClassConfiguration[itemClassID]?.meta?.title}
-              </Link>
-            </li>
-          )}
-        </ul>
+      <Container
+          breadcrumbs={breadcrumbs}
+          title={subregister.title}
+          contentType={{ icon: 'folder-open', name: 'Subregister' }}>
+        {subregister.itemClasses.map(itemClassID =>
+          <ItemClassCard key={itemClassID} itemClass={itemClassConfiguration[itemClassID]} />
+        )}
 
         {statistics
           ? <RegistryStats stats={statistics} />

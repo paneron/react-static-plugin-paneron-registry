@@ -23,7 +23,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   const subregister = subregisterID ? subregisters[subregisterID] : undefined;
 
   function navigateToSubregister() {
-    navigate(`/${subregisterID}`);
+    navigate(`/${subregisterID}/`);
   }
 
   const breadcrumbs: IBreadcrumbProps[] = [{

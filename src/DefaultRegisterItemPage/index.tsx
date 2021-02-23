@@ -30,22 +30,22 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
 
   const jumpToItem = (classID: string, itemID: string, subregisterID?: string) => {
     if (subregisterID) {
-      navigate(`/${subregisterID}/${classID}/${itemID}`);
+      navigate(`/${subregisterID}/${classID}/${itemID}/`);
     } else {
-      navigate(`/${classID}/${itemID}`);
+      navigate(`/${classID}/${itemID}/`);
     }
   }
 
   function navigateToClass() {
     if (subregisterID) {
-      navigate(`/${subregisterID}/${itemClassID}`);
+      navigate(`/${subregisterID}/${itemClassID}/`);
     } else {
-      navigate(`/${itemClassID}`);
+      navigate(`/${itemClassID}/`);
     }
   }
 
   function navigateToSubregister() {
-    navigate(`/${subregisterID}`);
+    navigate(`/${subregisterID}/`);
   }
 
   const jsonHref = './item.json';

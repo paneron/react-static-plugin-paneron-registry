@@ -50,6 +50,7 @@
     "jsdom": "^16.4.0",
     "probe-image-size": "^5.0.0",
     "react": "^16.13.1",
+    "react-mathjax2": "^0.0.2",
     "styled-components": "^5.2.0"
   },
   "peerDependencies": {

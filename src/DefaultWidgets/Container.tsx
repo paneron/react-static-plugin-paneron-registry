@@ -26,7 +26,7 @@ const ContainerWrapperDiv = styled.div`
   bottom: 0;
   right: 0;
   left: 0;
-  overfow-y: auto;
+  overflow-y: auto;
   padding-top: 60px;
 `;
 

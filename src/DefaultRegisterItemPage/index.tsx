@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { navigate } from '@reach/router';
 import { useRouteData } from 'react-static';
-import { Tag, Breadcrumbs, IBreadcrumbProps } from '@blueprintjs/core';
+import { Text, IBreadcrumbProps } from '@blueprintjs/core';
 import { DefaultPageProps, RegisterItemPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { BrowserCtx } from '@riboseinc/paneron-registry-kit/views/util';
@@ -49,14 +49,13 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
 
   const breadcrumbs: IBreadcrumbProps[] = [{
     onClick: navigateToClass,
-    icon: 'folder-open',
+    icon: 'cube',
     current: false,
-    text: <><Tag minimal>Item class</Tag>&nbsp;{itemClass.meta.title}</>,
+    text: <>&nbsp;{itemClass.meta.title}</>,
   }, {
-    disabled: true,
     current: true,
     icon: 'document',
-    text: <><Tag minimal>Item</Tag></>,
+    text: <><small><Text ellipsize>{item.id}</Text></small></>,
   }];
 
   if (subregisterID) {
@@ -64,7 +63,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
       onClick: navigateToSubregister,
       icon: 'folder-open',
       current: false,
-      text: <><Tag minimal>Subregister</Tag>&nbsp;{subregisters[subregisterID].title}</>,
+      text: <>{subregisters[subregisterID].title}</>,
     });
   }
 
@@ -74,14 +73,13 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
         <title>Item {item.id} — {register.name}</title>
       </Helmet>
 
-      <Container>
-        <Breadcrumbs items={breadcrumbs} />
-
+      <Container breadcrumbs={breadcrumbs}>
         <h2>
           <ItemView
             itemData={item.data}
             itemID={item.id} 
             useRegisterItemData={useRegisterItemData}
+            subregisterID={subregisterID}
             getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)} />
         </h2>
 
@@ -89,6 +87,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
           itemData={item.data}
           useRegisterItemData={useRegisterItemData}
           getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+          subregisterID={subregisterID}
         />
       </Container>
     </BrowserCtx.Provider>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { navigate } from '@reach/router';
 import { useRouteData } from 'react-static';
-import { Tag, Breadcrumbs, IBreadcrumbProps } from '@blueprintjs/core';
+import { IBreadcrumbProps } from '@blueprintjs/core';
 import { DefaultPageProps, ItemClassPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { useRegisterItemData, _getRelatedClass } from '../DefaultWidgets/helpers';
@@ -27,9 +27,9 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   }
 
   const breadcrumbs: IBreadcrumbProps[] = [{
-    icon: 'folder-open',
+    icon: 'application',
     current: true,
-    text: <><Tag minimal>Item class</Tag>&nbsp;{itemClass.meta.title}</>,
+    text: <>{itemClass.meta.title}</>,
   }];
 
   if (subregisterID) {
@@ -37,19 +37,17 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
       onClick: navigateToSubregister,
       icon: 'folder-open',
       current: false,
-      text: <><Tag minimal>Subregister</Tag>&nbsp;{subregisters[subregisterID].title}</>,
+      text: <>{subregisters[subregisterID].title}</>,
     });
   }
 
   return (
     <>
       <Helmet>
-        <title>Item class {itemClass.meta.title}{subregister ? ` in subregister ${subregister.title}` : ''} — {register.name}</title>
+        <title>{itemClass.meta.title}{subregister ? ` in ${subregister.title}` : ''} — {register.name}</title>
       </Helmet>
 
-      <Container>
-        <Breadcrumbs items={breadcrumbs} />
-
+      <Container breadcrumbs={breadcrumbs}>
         <ul>
           {items.map((item, idx) =>
             <li key={idx}>
@@ -59,6 +57,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
                   itemData={item.data}
                   useRegisterItemData={useRegisterItemData}
                   getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+                  subregisterID={subregisterID}
                 />
               </Link>
             </li>

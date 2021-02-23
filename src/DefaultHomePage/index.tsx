@@ -19,8 +19,6 @@ export default () => {
       </Helmet>
 
       <Container>
-        <h2>Register <em>{register.name}</em></h2>
-
         <dl>
           <dt>Content summary</dt>
           <dd>

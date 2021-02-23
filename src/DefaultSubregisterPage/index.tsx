@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useRouteData } from 'react-static';
-import { Tag, Breadcrumbs, IBreadcrumbProps } from '@blueprintjs/core';
+import { IBreadcrumbProps } from '@blueprintjs/core';
 import Container from '../DefaultWidgets/Container';
 import { _getRelatedClass } from '../DefaultWidgets/helpers';
 import { SubregisterPageRouteData } from '../types';
@@ -18,22 +18,18 @@ export default () => {
   }: SubregisterPageRouteData = useRouteData();
 
   const breadcrumbs: IBreadcrumbProps[] = [{
-      icon: 'folder-open',
-      current: true,
-      text: <><Tag minimal>Subregister</Tag>&nbsp;{subregister.title}</>,
-    }];
+    icon: 'folder-open',
+    current: true,
+    text: <>{subregister.title}</>,
+  }];
 
   return (
     <>
       <Helmet>
-        <title>Subregister {subregister?.title ?? "<unnamed>"} — {register.name}</title>
+        <title>{subregister?.title ?? "<unnamed subregister>"} — {register.name}</title>
       </Helmet>
 
-      <Container>
-        <Breadcrumbs items={breadcrumbs} />
-
-        <h3>Item classes</h3>
-
+      <Container breadcrumbs={breadcrumbs}>
         <ul>
           {subregister.itemClasses.map(itemClassID =>
             <li key={itemClassID}>

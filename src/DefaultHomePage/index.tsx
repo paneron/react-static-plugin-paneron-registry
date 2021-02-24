@@ -37,6 +37,17 @@ export default () => {
       </FormGroup>
     </>,
   }, {
+    title: "Version",
+    content: <>
+      <H5>
+        {register.version?.id ?? 'N/A'}
+      </H5>
+      <FormGroup label="Date:">
+        {register.version?.timestamp ?? 'N/A'}
+      </FormGroup>
+
+    </>,
+  }, {
     title: "Statistics",
     content: <>
       <FormGroup label="Total number of items:">

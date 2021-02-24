@@ -18,12 +18,12 @@ export default () => {
   }: MainRegistryPageRouteData = useRouteData();
 
   const metaBlocks: IMetaBlock[] = [{
-    title: "Content summary:",
+    title: "Content summary",
     content: <>
       <p className={Classes.RUNNING_TEXT}>{register.contentSummary ?? 'N/A'}</p>
     </>,
   }, {
-    title: "Operating language:",
+    title: "Operating language",
     content: <>
       <H5>
         {register.operatingLanguage
@@ -37,7 +37,7 @@ export default () => {
       </FormGroup>
     </>,
   }, {
-    title: "Statistics:",
+    title: "Statistics",
     content: <>
       <FormGroup label="Total number of items:">
         <span style={{ fontSize: '140%' }}>

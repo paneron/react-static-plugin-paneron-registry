@@ -176,10 +176,10 @@ export default ({
             reverseRelationGetter));
       } else {
         commonRouteData.subregisters = {};
-        const itemClassDirents = dirTree(
-          datasetSourcePath,
-          { attributes: ['isDirectory'] },
-        ).children ?? [];
+        const itemClassDirents = (dirTree(
+            datasetSourcePath,
+            { attributes: ['isDirectory'] },
+          ).children ?? []).filter(dirent => dirent.type === 'directory');
         registerContentRoutes = itemClassDirents.
           map(dirent => direntToItemClassRoute(
             registerItem,
@@ -355,9 +355,10 @@ function getItemClassPageRouteData(
     const items = await Promise.all(itemPaths.map(async (itemPath) => await getFileData<RegisterItem<any>>(itemPath)));
 
     let itemsSorted: RegisterItem<any>[];
-    if (itemClass.itemSorter) {
+    if (itemClass?.itemSorter) {
       itemsSorted = items.sort((i1, i2) => itemClass.itemSorter!(i1.data, i2.data));
     } else {
+      console.warn("Item class page: item sorter is not provided", itemClassID, context?.itemClassConfiguration, itemClass?.meta?.id);
       itemsSorted = items;
     }
 

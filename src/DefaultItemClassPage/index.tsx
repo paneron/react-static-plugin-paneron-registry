@@ -2,11 +2,12 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { navigate } from '@reach/router';
 import { useRouteData } from 'react-static';
-import { IBreadcrumbProps } from '@blueprintjs/core';
+import { IBreadcrumbProps, UL } from '@blueprintjs/core';
 import { DefaultPageProps, ItemClassPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { useRegisterItemData, _getRelatedClass } from '../DefaultWidgets/helpers';
 import { Link } from '../DefaultWidgets/linksButtons';
+import Card from '../DefaultWidgets/Card';
 
 
 export default ({ itemClassConfiguration }: DefaultPageProps) => {
@@ -52,21 +53,23 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
           breadcrumbs={breadcrumbs}
           title={itemClass.meta.title}
           contentType={{ icon: 'folder-open', name: "Item class" }}>
-        <ul>
-          {items.map((item, idx) =>
-            <li key={idx}>
-              <Link to={item.id} relative>
-                <ItemView
-                  itemID={item.id}
-                  itemData={item.data}
-                  useRegisterItemData={useRegisterItemData}
-                  getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
-                  subregisterID={subregisterID}
-                />
-              </Link>
-            </li>
-          )}
-        </ul>
+        <Card>
+          <UL>
+            {items.map((item, idx) =>
+              <li key={idx}>
+                <Link to={item.id} relative>
+                  <ItemView
+                    itemID={item.id}
+                    itemData={item.data}
+                    useRegisterItemData={useRegisterItemData}
+                    getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+                    subregisterID={subregisterID}
+                  />
+                </Link>
+              </li>
+            )}
+          </UL>
+        </Card>
       </Container>
     </>
   );

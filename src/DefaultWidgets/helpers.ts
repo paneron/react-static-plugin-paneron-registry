@@ -69,8 +69,3 @@ export const useRegisterItemData: RegisterItemDataHook = (paths: ObjectDataReque
     _reqCounter: 0,
   };
 };
-
-//   return useRegisterItemData;
-// 
-// }
-// 

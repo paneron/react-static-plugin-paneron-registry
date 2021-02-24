@@ -141,7 +141,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
           breadcrumbs={breadcrumbs}
           metaBlocks={metaBlocks}
           contentType={{ icon: 'document', name: "Item" }}>
-        <ItemCard elevation={3}>
+        <ItemCard elevation={3} style={{ position: 'relative', overflowY: 'auto', minHeight: '75vh' }}>
           <DetailView
             itemData={item.data}
             useRegisterItemData={useRegisterItemData}

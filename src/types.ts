@@ -59,6 +59,13 @@ export interface RegisterItemPageRouteData extends CommonRouteData {
 
   subregisterID?: string
   itemClassID: string
+
+  reverseRelations: RelationSet
+}
+
+
+export interface RelationSet {
+  [itemID: string]: { classID: string, subregisterID?: string }
 }
 
 

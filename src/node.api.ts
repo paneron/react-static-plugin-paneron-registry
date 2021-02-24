@@ -16,12 +16,19 @@ import {
   CommonRouteData,
   ItemClassPageRouteData,
   SubregisterPageRouteData,
+  RelationSet,
 } from './types';
 
 import SimpleCache from './SimpleCache';
+import { Payload } from '@riboseinc/paneron-registry-kit/types/item';
 
 
 const cache = new SimpleCache();
+
+
+type ReverseRelationGetter =
+  (itemID: string, classID: string, subregisterID?: string) =>
+    RelationSet;
 
 
 interface ItemCache {
@@ -32,7 +39,46 @@ interface ItemCache {
 }
 
 
+interface ItemRef {
+  itemID: string
+  classID: string
+  subregisterID?: string
+}
+
+
 type ItemCallback = (item: ItemCache) => void
+
+
+function detectRelations(itemData: Payload, relationSet?: RelationSet): RelationSet {
+  const result: RelationSet = relationSet ?? {};
+  for (const i in itemData) {
+    if (Object.prototype.hasOwnProperty.call(itemData, i)) {
+      if (typeof itemData[i] === 'object' && itemData[i] !== null) {
+        if (itemData[i].itemID && itemData[i].classID) {
+          const relation: ItemRef = itemData[i];
+          result[relation.itemID] = { classID: relation.itemID, subregisterID: relation.subregisterID };
+        } else {
+          detectRelations(itemData[i], result);
+        }
+      } else if (typeof itemData[i] === 'string' && isUUIDv4(itemData[i])) {
+        result[itemData[i]] = { classID: '', subregisterID: '' };
+      }
+    }
+  }
+  return result;
+}
+
+
+function isUUIDv4(value: string): boolean {
+  const result = (
+    value.match(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i) ?? // v4
+    value.match(/^[0-9A-F]{8}-[0-9A-F]{4}-[3][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i) ?? // v3
+    value.match(/^[0-9A-F]{8}-[0-9A-F]{4}-[2][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i) ?? // v2
+    value.match(/^[0-9A-F]{8}-[0-9A-F]{4}-[1][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i) ?? // v1
+    value.match(/^[0-9A-F]{8}-[0-9A-F]{4}-[5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)    // v5
+  );
+  return result !== null;
+}
 
 
 export default ({
@@ -48,7 +94,11 @@ export default ({
 }: PluginConfig) => {
 
   const itemCache: ItemCache[] = [];
+  const reverseRelationCache: { [toItemID: string]: RelationSet } = {};
 
+  const reverseRelationGetter: ReverseRelationGetter = function (toItemID, ofClassID, inSubregisterID) {
+    return reverseRelationCache[toItemID] ?? {};
+  };
 
   function getTemplate(what: 'RegisterItem' | 'ItemClass' | 'Subregister' | 'Home'): string {
     //console.debug("Getting template", __dirname, what);
@@ -62,7 +112,8 @@ export default ({
     } else if (what === 'Home' && homePageTemplate) {
       return homePageTemplate;
     }
-    return path.join(__dirname, `Default${what}Page/index`);
+    throw new Error("Unknown template requested");
+    //return path.join(__dirname, `Default${what}Page/index`);
   }
 
   return {
@@ -120,7 +171,8 @@ export default ({
             subregisterTemplate,
             itemClassTemplate,
             itemTemplate,
-            commonRouteData));
+            commonRouteData,
+            reverseRelationGetter));
       } else {
         commonRouteData.subregisters = {};
         const itemClassDirents = dirTree(
@@ -133,7 +185,8 @@ export default ({
             dirent,
             itemClassTemplate,
             itemTemplate,
-            commonRouteData));
+            commonRouteData,
+            reverseRelationGetter));
       }
 
       let routes: Route[] = [
@@ -148,6 +201,20 @@ export default ({
           children: registerContentRoutes,
         },
       ];
+
+      for (const item of itemCache) {
+        const itemData = await getFileData<RegisterItem<any>>(item.dataPath);
+        const outgoingRelations = detectRelations(itemData);
+        for (const itemID of Object.keys(outgoingRelations)) {
+          if (itemID !== item.itemID) {
+            reverseRelationCache[itemID] ||= {};
+            reverseRelationCache[itemID][item.itemID] = {
+              classID: item.itemClassID,
+              subregisterID: item.subregisterID,
+            };
+          }
+        }
+      }
 
       return routes;
     },
@@ -182,6 +249,7 @@ function direntToSubregRoute(
   itemClassTemplate: string,
   itemTemplate: string,
   context: CommonRouteData,
+  reverseRelationGetter: ReverseRelationGetter,
 ): Route {
   const subregisterID = dirent.name;
 
@@ -195,6 +263,7 @@ function direntToSubregRoute(
         itemClassTemplate,
         itemTemplate,
         context,
+        reverseRelationGetter,
         subregisterID,
       )),
     getData: getSubregisterPageRouteData(dirent, context),
@@ -208,6 +277,7 @@ function direntToItemClassRoute(
   itemClassTemplate: string,
   itemTemplate: string,
   context: CommonRouteData,
+  reverseRelationGetter: ReverseRelationGetter,
   subregisterID?: string,
 ): Route {
   const classID = dirent.name;
@@ -222,6 +292,7 @@ function direntToItemClassRoute(
         itemTemplate,
         context,
         classID,
+        reverseRelationGetter,
         subregisterID,
       )),
     getData: getItemClassPageRouteData(dirent, context, subregisterID),
@@ -235,6 +306,7 @@ function direntToItemRoute(
   itemTemplate: string,
   context: CommonRouteData,
   itemClassID: string,
+  reverseRelationGetter: ReverseRelationGetter,
   subregisterID?: string,
 ): Route {
   const itemID = noExt(dirent.name);
@@ -244,7 +316,7 @@ function direntToItemRoute(
   return {
     path: itemID,
     template: itemTemplate,
-    getData: getItemPageRouteData(dirent, context, itemClassID, subregisterID),
+    getData: getItemPageRouteData(dirent, context, itemClassID, reverseRelationGetter, subregisterID),
   };
 }
 
@@ -296,18 +368,21 @@ function getItemPageRouteData(
   dirent: DirectoryTree,
   context: CommonRouteData,
   itemClassID: string,
+  reverseRelationGetter: ReverseRelationGetter,
   subregisterID?: string,
 ): () => Promise<RegisterItemPageRouteData> {
 
   return async () => {
     const dataPath = dirent.path;
     const item = await getFileData<RegisterItem<any>>(dataPath);
+    const reverseRelations = reverseRelationGetter(item.id, itemClassID, subregisterID);
 
     return {
       ...context,
       itemClassID,
       subregisterID,
       item,
+      reverseRelations,
     };
   };
 }

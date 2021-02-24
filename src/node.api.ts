@@ -354,12 +354,19 @@ function getItemClassPageRouteData(
   return async () => {
     const items = await Promise.all(itemPaths.map(async (itemPath) => await getFileData<RegisterItem<any>>(itemPath)));
 
+    let itemsSorted: RegisterItem<any>[];
+    if (itemClass.itemSorter) {
+      itemsSorted = items.sort((i1, i2) => itemClass.itemSorter!(i1.data, i2.data));
+    } else {
+      itemsSorted = items;
+    }
+
     return {
       ...context,
       itemClassID,
       subregisterID,
       itemClass,
-      items,
+      items: itemsSorted,
     };
   };
 }

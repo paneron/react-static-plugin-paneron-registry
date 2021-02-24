@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { H2, Tag, Breadcrumbs, Classes, Colors, IBreadcrumbProps, Icon, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, IconName } from '@blueprintjs/core';
 import { Link } from './linksButtons';
 import MetaBlock, { IMetaBlock } from './MetaBlock';
+import Card from './Card';
 
 
 const HeaderLink = styled(Link)`
@@ -175,3 +176,31 @@ function ({ children, breadcrumbs, title, contentType, metaBlocks }) {
 
 
 export default Container;
+
+
+export const ContainerSkeleton: React.FC<Record<never, never>> = function () {
+  const loading = "Loading…";
+  const loadingEl = <span className={Classes.SKELETON}>{loading}</span>;
+
+  return (
+    <ContainerWrapperDiv>
+      <StyledNavbar fixedToTop>
+        <NavbarGroup style={{ marginLeft: '20px' }}>
+          <Heading>
+            {loadingEl}
+          </Heading>
+        </NavbarGroup>
+      </StyledNavbar>
+      <ContainerDiv>
+        <Main>
+          <PageHeaderWithTitle>{loadingEl}</PageHeaderWithTitle>
+          <Card>{loadingEl}</Card>
+        </Main>
+        <MetaSidebar>
+          <MetaBlock block={{ title: loadingEl, content: loadingEl }} className={Classes.ELEVATION_1} />
+          <MetaBlock block={{ title: loadingEl, content: loadingEl }} className={Classes.ELEVATION_1} />
+        </MetaSidebar>
+      </ContainerDiv>
+    </ContainerWrapperDiv>
+  );
+};

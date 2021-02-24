@@ -66,7 +66,7 @@ export default () => {
         <title>{register.name}</title>
       </Helmet>
 
-      <Container metaBlocks={metaBlocks}>
+      <Container metaBlocks={metaBlocks} title="Item classes">
         {Object.entries(itemClassConfiguration).map(([classID, classData]) =>
           <ItemClassCard
             style={{ marginBottom: '1em' }}

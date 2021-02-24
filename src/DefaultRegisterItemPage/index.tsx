@@ -120,14 +120,14 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   if (Object.keys(reverseRelations).length > 0) {
     metaBlocks.splice(1, 0, {
       title: "Inferred relationships",
-      content: <>
+      content: <div style={{ marginBottom: '1rem' }}>
         {Object.entries(reverseRelations).map(([fromItemID, meta]) =>
           <GenericRelatedItemView
             itemRef={{ itemID: fromItemID, classID: meta.classID, subregisterID: meta.subregisterID }}
             getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
             useRegisterItemData={useRegisterItemData} />
         )}
-      </>,
+      </div>,
     });
   }
 

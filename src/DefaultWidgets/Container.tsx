@@ -193,7 +193,7 @@ export const ContainerSkeleton: React.FC<Record<never, never>> = function () {
       </StyledNavbar>
       <ContainerDiv>
         <Main>
-          <PageHeaderWithTitle>{loadingEl}</PageHeaderWithTitle>
+          <PageHeaderWithTitle className={Classes.SKELETON}>{loading}</PageHeaderWithTitle>
           <Card>{loadingEl}</Card>
         </Main>
         <MetaSidebar>

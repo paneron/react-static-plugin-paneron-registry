@@ -5,10 +5,11 @@ import { useRouteData } from 'react-static';
 import { ButtonGroup, FormGroup, IBreadcrumbProps, H5 } from '@blueprintjs/core';
 import { DefaultPageProps, RegisterItemPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
-import { BrowserCtx } from '@riboseinc/paneron-registry-kit/views/util';
+import { BrowserCtx, GenericRelatedItemView } from '@riboseinc/paneron-registry-kit/views/util';
 import { useRegisterItemData, _getRelatedClass } from '../DefaultWidgets/helpers';
 import { ButtonLink } from '../DefaultWidgets/linksButtons';
 import { ItemCard } from '../DefaultWidgets/Card';
+import type { IMetaBlock } from '../DefaultWidgets/MetaBlock';
 
 
 export default ({ itemClassConfiguration }: DefaultPageProps) => {
@@ -18,6 +19,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
     item,
     itemClassID,
     subregisterID,
+    reverseRelations,
   }: RegisterItemPageRouteData = useRouteData();
 
   const itemClass = itemClassConfiguration[itemClassID];
@@ -79,6 +81,56 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
     });
   }
 
+  const metaBlocks: IMetaBlock[] = [{
+    title: "Normative status",
+    content: <>
+      <H5>{item.status}</H5>
+      <FormGroup label="Date accepted:">
+        {item.dateAccepted}
+      </FormGroup>
+    </>,
+  }, {
+    title: "Classification",
+    icon: 'cube',
+    content: <>
+      <H5>{itemClass.meta.title}</H5>
+      <p>{itemClass.meta.description}</p>
+    </>,
+  }, {
+    title: "Registration",
+    content: <>
+      {subregisterID
+        ? <FormGroup label="Subregister:">
+            {subregisters[subregisterID].title}
+          </FormGroup>
+        : null}
+      <FormGroup label="Item ID:">
+        {item.id}
+      </FormGroup>
+    </>,
+  }, {
+    title: "In other formats",
+    content: <>
+      <ButtonGroup vertical fill style={{ marginBottom: '1em', }}>
+        <ButtonLink to={jsonHref} external>Get as JSON</ButtonLink>
+      </ButtonGroup>
+    </>,
+  }];
+
+  if (Object.keys(reverseRelations).length > 0) {
+    metaBlocks.splice(1, 0, {
+      title: "Inferred relationships",
+      content: <>
+        {Object.entries(reverseRelations).map(([fromItemID, meta]) =>
+          <GenericRelatedItemView
+            itemRef={{ itemID: fromItemID, classID: meta.classID, subregisterID: meta.subregisterID }}
+            getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+            useRegisterItemData={useRegisterItemData} />
+        )}
+      </>,
+    });
+  }
+
   return (
     <BrowserCtx.Provider value={{ jumpToItem }}>
       <Helmet>
@@ -87,43 +139,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
 
       <Container
           breadcrumbs={breadcrumbs}
-          metaBlocks={[{
-            title: "Normative status",
-            content: <>
-              <FormGroup label="Normative status:">
-                {item.status}
-              </FormGroup>
-              <FormGroup label="Date accepted:">
-                {item.dateAccepted}
-              </FormGroup>
-            </>,
-          }, {
-            title: "Class",
-            icon: 'cube',
-            content: <>
-              <H5>{itemClass.meta.title}</H5>
-              <p>{itemClass.meta.description}</p>
-            </>,
-          }, {
-            title: "Registration",
-            content: <>
-              {subregisterID
-                ? <FormGroup label="Subregister:">
-                    {subregisters[subregisterID].title}
-                  </FormGroup>
-                : null}
-              <FormGroup label="Item ID:">
-                {item.id}
-              </FormGroup>
-            </>,
-          }, {
-            title: "In other formats",
-            content: <>
-              <ButtonGroup vertical fill style={{ marginBottom: '1em', }}>
-                <ButtonLink to={jsonHref} external>Get as JSON</ButtonLink>
-              </ButtonGroup>
-            </>,
-          }]}
+          metaBlocks={metaBlocks}
           contentType={{ icon: 'document', name: "Item" }}>
         <ItemCard elevation={3}>
           <DetailView

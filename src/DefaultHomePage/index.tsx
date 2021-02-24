@@ -60,7 +60,7 @@ export default () => {
           <ItemClassCard
             style={{ marginBottom: '1em' }}
             itemClass={classData}
-            subregisters={subregisters}
+            subregisters={Object.keys(subregisters).length > 0 ? subregisters : undefined}
             key={classID}
           />
         )}

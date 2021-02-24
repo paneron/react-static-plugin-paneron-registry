@@ -59,7 +59,7 @@ export const useRegisterItemData: RegisterItemDataHook = (paths: ObjectDataReque
   }, [JSON.stringify(paths)]);
 
 
-  console.debug("Fetched register item data", paths, data);
+  //console.debug("Fetched register item data", paths, data);
 
   return {
     value: data,

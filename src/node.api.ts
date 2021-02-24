@@ -85,7 +85,7 @@ export default ({
   datasetSourcePath, urlPrefix,
   itemClassConfiguration,
   subregisters,
-  footerBanner, headerBanner, footerBannerLink,
+  iconURL, footerBanner, headerBanner, footerBannerLink,
 
   itemClassPageTemplate,
   itemPageTemplate,
@@ -147,6 +147,7 @@ export default ({
         subregisters,
         itemClassConfiguration,
         headerBanner,
+        iconURL,
         footerBanner,
         footerBannerLink,
         hasSubregisters,

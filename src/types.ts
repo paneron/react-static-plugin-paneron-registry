@@ -26,6 +26,7 @@ export interface DefaultPageProps {
 export interface CommonRouteData {
   siteURLPrefix: string
   registerURLPrefix: string
+  iconURL?: string
   footerBanner?: string
   headerBanner?: string
   footerBannerLink?: string
@@ -40,6 +41,7 @@ export interface CommonRouteData {
 export interface PluginConfig {
   datasetSourcePath: string
   urlPrefix: string
+  iconURL?: string
   headerBanner?: string
   footerBanner?: string
   footerBannerLink?: string

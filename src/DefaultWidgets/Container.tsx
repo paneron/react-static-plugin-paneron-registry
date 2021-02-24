@@ -64,6 +64,8 @@ const BreadcrumbsStyled = styled(Breadcrumbs)`
 
 const Heading = styled(NavbarHeading)`
   white-space: nowrap;
+  display: flex;
+  align-items: center;
 `;
 
 
@@ -110,7 +112,7 @@ export const Container: React.FC<{
   metaBlocks?: IMetaBlock[]
 }> =
 function ({ children, breadcrumbs, title, contentType, metaBlocks }) {
-  const { register } = useRouteData();
+  const { register, iconURL } = useRouteData();
 
   const pageHeaderContents = <H2>
     {title}
@@ -123,8 +125,11 @@ function ({ children, breadcrumbs, title, contentType, metaBlocks }) {
   return (
     <ContainerWrapperDiv>
       <StyledNavbar fixedToTop>
-        <NavbarGroup>
+        <NavbarGroup style={{ marginLeft: '20px' }}>
           <Heading>
+            {iconURL
+              ? <img src={iconURL} style={{ width: '24px', height: '24px', marginRight: '.25em' }} />
+              : null}
             {register.name}
           </Heading>
           <NavbarDivider />

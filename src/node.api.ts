@@ -179,7 +179,7 @@ export default ({
         const itemClassDirents = (dirTree(
             datasetSourcePath,
             { attributes: ['isDirectory'] },
-          ).children ?? []).filter(dirent => dirent.type === 'directory');
+          ).children ?? []).filter(dirent => dirent.type === 'directory' && dirent.name !== 'change-requests');
         registerContentRoutes = itemClassDirents.
           map(dirent => direntToItemClassRoute(
             registerItem,

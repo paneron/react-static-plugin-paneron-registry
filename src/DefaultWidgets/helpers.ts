@@ -21,8 +21,8 @@ export const _getRelatedClass = (classes: Record<string, ItemClassConfiguration<
 
 
 function itemPathToJSONPath(itemPath: string) {
-  if (itemPath.startsWith('/subregisters')) {
-    return `/${itemPath.replace('/subregisters/', '').replace('.yaml', '')}/item.json`;
+  if (itemPath.startsWith('subregisters') || itemPath.startsWith('/subregisters')) {
+    return `/${itemPath.replace('/subregisters/', '').replace('subregisters/', '').replace('.yaml', '')}/item.json`;
   } else {
     return `/${itemPath}/item.json`;
   }

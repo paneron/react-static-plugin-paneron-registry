@@ -54,12 +54,14 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
 
   const jsonHref = './item.json';
 
+  const getRelatedItemClassConfiguration = _getRelatedClass(itemClassConfiguration);
+
   const itemView = <ItemView
     itemData={item.data}
     itemID={item.id} 
     useRegisterItemData={useRegisterItemData}
     subregisterID={subregisterID}
-    getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)} />;
+    getRelatedItemClassConfiguration={getRelatedItemClassConfiguration} />;
 
   const breadcrumbs: IBreadcrumbProps[] = [{
     onClick: navigateToClass,
@@ -125,7 +127,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
         {Object.entries(reverseRelations).map(([fromItemID, meta]) =>
           <GenericRelatedItemView
             itemRef={{ itemID: fromItemID, classID: meta.classID, subregisterID: meta.subregisterID }}
-            getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+            getRelatedItemClassConfiguration={getRelatedItemClassConfiguration}
             useRegisterItemData={useRegisterItemData} />
         )}
       </div>,
@@ -146,7 +148,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
           <DetailView
             itemData={item.data}
             useRegisterItemData={useRegisterItemData}
-            getRelatedItemClassConfiguration={_getRelatedClass(itemClassConfiguration)}
+            getRelatedItemClassConfiguration={getRelatedItemClassConfiguration}
             subregisterID={subregisterID}
           />
         </ItemCard>

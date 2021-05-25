@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { navigate } from '@reach/router';
 import { useRouteData } from 'react-static';
-import { ButtonGroup, FormGroup, IBreadcrumbProps, H5 } from '@blueprintjs/core';
+import { ButtonGroup, FormGroup, H5, BreadcrumbProps } from '@blueprintjs/core';
 import { BrowserCtx } from '@riboseinc/paneron-registry-kit/views/BrowserCtx';
 import { GenericRelatedItemView } from '@riboseinc/paneron-registry-kit/views/util';
 import { DefaultPageProps, RegisterItemPageRouteData } from '../types';
@@ -63,7 +63,7 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
     subregisterID={subregisterID}
     getRelatedItemClassConfiguration={getRelatedItemClassConfiguration} />;
 
-  const breadcrumbs: IBreadcrumbProps[] = [{
+  const breadcrumbs: BreadcrumbProps[] = [{
     onClick: navigateToClass,
     icon: 'cube',
     current: false,
@@ -135,7 +135,13 @@ export default ({ itemClassConfiguration }: DefaultPageProps) => {
   }
 
   return (
-    <BrowserCtx.Provider value={{ jumpToItem }}>
+    <BrowserCtx.Provider
+        value={{
+          jumpToItem,
+          useRegisterItemData,
+          itemClasses: itemClassConfiguration,
+          getRelatedItemClassConfiguration,
+        }}>
       <Helmet>
         <title>Item {item.id} — {register.name}</title>
       </Helmet>

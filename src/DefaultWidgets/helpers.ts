@@ -8,8 +8,6 @@ import {
   RelatedItemClassConfiguration,
 } from '@riboseinc/paneron-registry-kit/types';
 
-import { ObjectDataRequest } from '@riboseinc/paneron-extension-kit/types';
-
 
 export const _getRelatedClass = (classes: Record<string, ItemClassConfiguration<any>>) => {
   return (clsID: string): RelatedItemClassConfiguration => {
@@ -23,8 +21,8 @@ export const _getRelatedClass = (classes: Record<string, ItemClassConfiguration<
 
 
 function itemPathToJSONPath(itemPath: string) {
-  if (itemPath.startsWith('subregisters')) {
-    return `/${itemPath.replace('subregisters/', '')}/item.json`;
+  if (itemPath.startsWith('/subregisters')) {
+    return `/${itemPath.replace('/subregisters/', '').replace('.yaml', '')}/item.json`;
   } else {
     return `/${itemPath}/item.json`;
   }
@@ -33,8 +31,7 @@ function itemPathToJSONPath(itemPath: string) {
 
 //export function makeRegisterItemDataHook(baseURL: string): RegisterItemDataHook {
 
-export const useRegisterItemData: RegisterItemDataHook = (paths: ObjectDataRequest) => {
-  const requestedPaths = Object.keys(paths);
+export const useRegisterItemData: RegisterItemDataHook = ({ itemPaths: requestedPaths }) => {
   const [data, setData] = useState<Record<string, any>>({});
   const [isUpdating, setIsUpdating] = useState(false);
   const [errors, setErrors] = useState<Error[]>([]);
@@ -56,7 +53,7 @@ export const useRegisterItemData: RegisterItemDataHook = (paths: ObjectDataReque
         setIsUpdating(false);
       }
     })();
-  }, [JSON.stringify(paths)]);
+  }, [JSON.stringify(requestedPaths)]);
 
 
   //console.debug("Fetched register item data", paths, data);

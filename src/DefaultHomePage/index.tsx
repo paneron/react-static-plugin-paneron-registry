@@ -5,8 +5,9 @@ import { MainRegistryPageRouteData } from '../types';
 import Container from '../DefaultWidgets/Container';
 import { Locale } from '@riboseinc/paneron-registry-kit/types';
 import { IMetaBlock } from '../DefaultWidgets/MetaBlock';
-import { Classes, FormGroup, H5 } from '@blueprintjs/core';
+import { Classes, FormGroup, H5, Icon, IconName } from '@blueprintjs/core';
 import ItemClassCard from '../DefaultWidgets/ItemClassCard';
+import ItemCard from '../DefaultWidgets/Card';
 
 
 export default () => {
@@ -15,14 +16,50 @@ export default () => {
     statistics,
     itemClassConfiguration,
     subregisters,
+    extraContent,
   }: MainRegistryPageRouteData = useRouteData();
 
-  const metaBlocks: IMetaBlock[] = [{
+  const {
+    contentSummaryHTML,
+    usageNoticeHTML,
+    sponsorsSupportersHTML,
+    contactNoticeHTML,
+    registrationAuthorityNoticeHTML,
+  } = extraContent;
+
+  const contentSummaryBlockContents: JSX.Element =
+    contentSummaryHTML
+      ? <div className={Classes.RUNNING_TEXT} dangerouslySetInnerHTML={{ __html: contentSummaryHTML }} />
+      : <p className={Classes.RUNNING_TEXT}>{register.contentSummary ?? 'N/A'}</p>;
+
+  let metaBlocks: IMetaBlock[] = [{
     title: "Content summary",
     content: <>
-      <p className={Classes.RUNNING_TEXT}>{register.contentSummary ?? 'N/A'}</p>
+      {contentSummaryBlockContents}
     </>,
-  }, {
+  }] ;
+
+  /*
+  if (usageNoticeHTML) {
+    metaBlocks.push({
+      title: "Usage",
+      content: <>
+        <div dangerouslySetInnerHTML={{ __html: usageNoticeHTML }} />
+      </>
+    });
+  }
+
+  if (sponsorsSupportersHTML) {
+    metaBlocks.push({
+      title: "Sponsors & supporters",
+      content: <>
+        <div dangerouslySetInnerHTML={{ __html: sponsorsSupportersHTML }} />
+      </>
+    });
+  }
+  */
+  
+  metaBlocks = metaBlocks.concat([{
     title: "Operating language",
     content: <>
       <H5>
@@ -58,7 +95,7 @@ export default () => {
         </span>
       </FormGroup>
     </>,
-  }];
+  }]);
 
   return (
     <>
@@ -75,8 +112,30 @@ export default () => {
             key={classID}
           />
         )}
+        {usageNoticeHTML
+          ? <MetaCard title="Usage" __html={usageNoticeHTML} />
+          : null}
+        {sponsorsSupportersHTML
+          ? <MetaCard title="Sponsors and Supporters" __html={sponsorsSupportersHTML} />
+          : null}
+        {contactNoticeHTML
+          ? <MetaCard title="Contacting us" __html={contactNoticeHTML} />
+          : null}
+        {registrationAuthorityNoticeHTML
+          ? <MetaCard title="Registration Authority" __html={registrationAuthorityNoticeHTML} />
+          : null}
       </Container>
     </>
+  );
+};
+
+
+const MetaCard: React.FC<{ icon?: IconName, title: JSX.Element | string, __html: string }> = function ({ icon, title, __html }) {
+  return (
+    <ItemCard style={{ marginBottom: '1em' }}>
+      <H5><Icon icon={icon ?? "info-sign"} />&ensp;{title}</H5>
+      <div dangerouslySetInnerHTML={{ __html }} />
+    </ItemCard>
   );
 };
 

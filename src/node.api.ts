@@ -87,6 +87,8 @@ export default ({
   subregisters,
   iconURL, footerBanner, headerBanner, footerBannerLink,
 
+  extraContent,
+
   itemClassPageTemplate,
   itemPageTemplate,
   subregisterPageTemplate,
@@ -142,6 +144,7 @@ export default ({
 
       const commonRouteData: CommonRouteData = {
         siteURLPrefix: _state.config.basePath || '',
+        extraContent: extraContent ?? {},
         registerURLPrefix: urlPrefix,
         register,
         subregisters,

@@ -23,6 +23,17 @@ export interface DefaultPageProps {
 }
 
 
+/* Content that is not part of ISO 19135-1 register metadata,
+   but is specific for register representation on e.g. website and other materials. */
+export interface ExtraContent {
+  contentSummaryHTML?: string
+  usageNoticeHTML?: string
+  sponsorsSupportersHTML?: string
+  contactNoticeHTML?: string
+  registrationAuthorityNoticeHTML?: string
+}
+
+
 export interface CommonRouteData {
   siteURLPrefix: string
   registerURLPrefix: string
@@ -35,6 +46,8 @@ export interface CommonRouteData {
   itemClassConfiguration: ItemClassConfigurationSet
   subregisters: Subregisters
   hasSubregisters: boolean
+
+  extraContent: ExtraContent
 }
 
 
@@ -48,6 +61,8 @@ export interface PluginConfig {
 
   itemClassConfiguration: ItemClassConfigurationSet
   subregisters: Subregisters
+
+  extraContent?: ExtraContent
 
   itemClassPageTemplate?: string
   itemPageTemplate?: string

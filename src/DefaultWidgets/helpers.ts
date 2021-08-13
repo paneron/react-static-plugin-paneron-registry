@@ -24,7 +24,7 @@ function itemPathToJSONPath(itemPath: string) {
   if (itemPath.startsWith('subregisters') || itemPath.startsWith('/subregisters')) {
     return `/${itemPath.replace('/subregisters/', '').replace('subregisters/', '').replace('.yaml', '')}/item.json`;
   } else {
-    return `/${itemPath}/item.json`;
+    return `/${itemPath.replace('.yaml', '').replace(/^\//, '')}/item.json`;
   }
 }
 
